@@ -66,7 +66,6 @@ impl<'a> Scene<'a> {
                     result.color.green.min(1.0),
                     result.color.blue.min(1.0)
                 );
-                //println!("Setting pixel row={} column={}", row, column);
                 camera.set_pixel(row, column, result_color);
             }
         }

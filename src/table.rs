@@ -19,12 +19,10 @@ impl<T: Clone> Table<T> {
 impl<T> Table<T> {
     fn get_index(&self, row: uint, column: uint) -> uint {
         if row >= self.height {
-            //throw std::out_of_range("row");
-            println!("Out of range {} >= {}", row, self.height);
+            fail!("Table::get_index: `row` overflow ({} >= {})", row, self.height)
         }
         if column >= self.width {
-            //throw std::out_of_range("column");
-            println!("Out of range {} >= {}", column, self.width);
+            fail!("Table::get_index: `column` overflow ({} >= {})", column, self.width)
         }
 
         row * self.width + column
