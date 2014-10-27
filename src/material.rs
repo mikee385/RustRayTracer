@@ -4,7 +4,7 @@ pub struct Material {
     pub color: ColorRGB,
     pub diffuse: f32,
     pub specular: f32,
-    pub shininess: uint,
+    pub shininess: u32,
     pub reflection:f32,
     pub refraction: f32,
     pub refractive_index: f32
@@ -28,7 +28,7 @@ pub struct MaterialBuilder {
     color: ColorRGB,
     diffuse: f32,
     specular: f32,
-    shininess: uint,
+    shininess: u32,
     reflection: f32,
     refraction: f32,
     refractive_index: f32
@@ -63,7 +63,7 @@ impl MaterialBuilder {
         self
     }
 
-    pub fn shininess(&mut self, shininess: uint) -> &mut MaterialBuilder {
+    pub fn shininess(&mut self, shininess: u32) -> &mut MaterialBuilder {
         self.shininess = shininess;
         self
     }

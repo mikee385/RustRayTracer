@@ -12,14 +12,14 @@ const BIAS: f32 = 1.0e-4;
 pub struct Scene<'a> {
     background_color: ColorRGB,
     refractive_index: f32,
-    max_ray_depth: uint,
+    max_ray_depth: u32,
     
     items: Vec<InternalObject<'a>>,
     lights: Vec<InternalLight<'a>>
 }
 
 impl<'a> Scene<'a> {
-    pub fn new(background_color: &ColorRGB, refractive_index: f32, max_ray_depth: uint) -> Scene {
+    pub fn new(background_color: &ColorRGB, refractive_index: f32, max_ray_depth: u32) -> Scene {
         Scene {
             background_color: *background_color,
             refractive_index: refractive_index,
@@ -123,7 +123,7 @@ impl<'a> Scene<'a> {
         }
     }
 
-    fn trace(&self, ray: &Ray3D, depth: uint) -> TraceResult {
+    fn trace(&self, ray: &Ray3D, depth: u32) -> TraceResult {
 
         // Find the nearest object that the ray intersects.
         let mut optional_nearest: Option<(&InternalObject, f32)> = None;
