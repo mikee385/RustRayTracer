@@ -71,7 +71,7 @@ impl<'a> Scene<'a> {
         }
         
         // Edge Detection
-        let mut is_edge: Table<bool> = Table::from_elem(width, height, false);
+        let mut is_edge = Table::from_elem(width, height, false);
         for row in range(1, height-1) {
             for column in range (1, width-1) {
                 let p1 = camera.get_pixel(row - 1, column - 1);
@@ -99,11 +99,11 @@ impl<'a> Scene<'a> {
         let sub_width = 3;
         let sub_height = 3;
         let sub_size = (sub_width * sub_height) as f32;
-        let mut sub_rays: Table<Ray3D> = Table::from_elem(sub_width, sub_height, Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
+        let mut sub_rays = Table::from_elem(sub_width, sub_height, Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
         for row in range(0, height) {
             for column in range (0, width) {
                 if *is_edge.get(row, column) {
-                    let mut pixel_color= *ColorRGB::black();
+                    let mut pixel_color = *ColorRGB::black();
                     
                     camera.get_sub_rays(row, column, &mut sub_rays);
                     for sub_row in range(0, sub_height) {
@@ -129,19 +129,19 @@ impl<'a> Scene<'a> {
         let mut optional_nearest: Option<(&InternalObject, f32)> = None;
         for current_item in self.items.iter() {
             let optional_intersection = current_item.object.intersect(ray);
-            match optional_intersection {
-                Some(current_distance) => match optional_nearest {
+            if optional_intersection.is_some() {
+                let current_distance = optional_intersection.unwrap();
+                match optional_nearest {
                     Some((_, nearest_distance)) => {
                         if current_distance < nearest_distance {
-                            optional_nearest = Some((current_item, current_distance))
+                            optional_nearest = Some((current_item, current_distance));
                         }
                     },
                     None => {
-                        optional_nearest = Some((current_item, current_distance))
+                        optional_nearest = Some((current_item, current_distance));
                     }
-                },
-                None => {}
-            };
+                }
+            }
         }
 
         // If the ray doesn't hit any objects, return the background color.
@@ -233,14 +233,12 @@ impl<'a> Scene<'a> {
             for shadow_item in self.items.iter() {
                 if shadow_item.index != light_item.index {
                     let shadow_result = shadow_item.object.intersect(&shadow_ray);
-                    match shadow_result {
-                        Some(distance) => {
-                            if distance < distance_to_light {
-                                shade = 0.0;
-                                break;
-                            }
-                        },
-                        None => {}
+                    if shadow_result.is_some() {
+                        let distance = shadow_result.unwrap();
+                        if distance < distance_to_light {
+                            shade = 0.0;
+                            break;
+                        }
                     }
                 }
             }

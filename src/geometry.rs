@@ -404,7 +404,7 @@ impl Direction3D {
     pub fn to_orthonormal_basis(&self) -> Matrix3D
     {
         if self.direction.x.abs() >= self.direction.y.abs() && self.direction.x.abs() >= self.direction.z.abs() {
-            let unit_x: &Vector3D = &self.direction;
+            let unit_x = &self.direction;
 
             let inv_xy_magnitude = 1.0 / (unit_x.x * unit_x.x + unit_x.y * unit_x.y).sqrt();
             let unit_y = Vector3D::from_xyz(
@@ -419,7 +419,7 @@ impl Direction3D {
 
             return Matrix3D::new(unit_x, &unit_y, &unit_z);
         } else if self.direction.y.abs() >= self.direction.z.abs() {
-            let unit_y: &Vector3D = &self.direction;
+            let unit_y = &self.direction;
 
             let inv_yz_magnitude = 1.0 / (unit_y.y * unit_y.y + unit_y.z * unit_y.z).sqrt();
             let unit_z = Vector3D::from_xyz(
@@ -434,7 +434,7 @@ impl Direction3D {
 
             return Matrix3D::new(&unit_x, unit_y, &unit_z);
         } else {
-            let unit_z: &Vector3D = &self.direction;
+            let unit_z = &self.direction;
 
             let inv_zx_magnitude = 1.0 / (unit_z.z * unit_z.z + unit_z.x * unit_z.x).sqrt();
             let unit_x = Vector3D::from_xyz(
