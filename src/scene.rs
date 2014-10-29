@@ -52,8 +52,8 @@ impl<'a> Scene<'a> {
     }
     
     pub fn render(&self, camera: &mut Camera) {
-        let width = camera.image.width;
-        let height = camera.image.height;
+        let width = camera.get_image().get_width();
+        let height = camera.get_image().get_height();
         
         // Initial Pixel Coloring
         for row in range(0, height) {

@@ -1,9 +1,9 @@
 use std::vec::{Vec};
 
 pub struct Table<T> {
-    pub width: uint,
-    pub height: uint,
-    pub data: Vec<T>
+    width: uint,
+    height: uint,
+    data: Vec<T>
 }
 
 impl<T: Clone> Table<T> {
@@ -27,13 +27,21 @@ impl<T> Table<T> {
 
         row * self.width + column
     }
+
+    pub fn get_width(&self) -> uint {
+        self.width
+    }
+
+    pub fn get_height(&self) -> uint {
+        self.height
+    }
     
     pub fn set(&mut self, row: uint, column: uint, value: T) {
         let index = self.get_index(row, column);
         self.data[index] = value;
     }
     
-    pub fn get<'a>(&'a self, row: uint, column: uint) -> &'a T {
+    pub fn get(&self, row: uint, column: uint) -> &T {
         let index = self.get_index(row, column);
         &self.data[index]
     }

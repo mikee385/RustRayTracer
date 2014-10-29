@@ -5,9 +5,9 @@ use table::{Table};
 const DEFAULT_COLOR: ColorRGB = ColorRGB {red: 0.0, green: 0.0, blue: 0.0};
 
 pub struct Camera {
-    pub image: Table<ColorRGB>,     
-    pub position: Point3D,
-    pub orientation: Matrix3D,
+    image: Table<ColorRGB>,     
+    position: Point3D,
+    orientation: Matrix3D,
     
     x_min: f32,
     y_max: f32,
@@ -44,6 +44,26 @@ impl Camera {
             distance_to_plane: distance_to_plane
         }
     }
+
+    pub fn get_image(&self) -> &Table<ColorRGB> {
+        &self.image
+    }
+
+    pub fn get_position(&self) -> &Point3D {
+        &self.position
+    }
+
+    pub fn get_orientation(&self) -> &Matrix3D {
+        &self.orientation
+    }
+
+    pub fn set_position(&mut self, position: &Point3D) {
+        self.position = *position
+    }
+
+    pub fn set_orientation(&mut self, orientation: &Matrix3D) {
+        self.orientation = *orientation
+    }
     
     pub fn get_primary_ray(&self, row: uint, column: uint) -> Ray3D {
         let point_in_camera = self.get_pixel_center(row, column);
@@ -52,12 +72,12 @@ impl Camera {
     }
     
     pub fn get_sub_rays(&self, row: uint, column: uint, rays: &mut Table<Ray3D>) {
-        let width = rays.width;
+        let width = rays.get_width();
         if width < 2 {
             fail!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
         }
         
-        let height = rays.height;
+        let height = rays.get_height();
         if height < 2 {
             fail!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
         }
@@ -78,7 +98,7 @@ impl Camera {
         }
     }
     
-    pub fn get_pixel<'a>(&'a self, row: uint, column: uint) -> &'a ColorRGB {
+    pub fn get_pixel(&self, row: uint, column: uint) -> &ColorRGB {
         self.image.get(row, column)
     }
     

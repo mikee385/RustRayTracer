@@ -114,7 +114,7 @@ fn main() {
         scene.render(&mut camera);
 
         let image = PPMImage::new("example1.ppm");
-        result = image.save(&camera.image);
+        result = image.save(camera.get_image());
         
     } else if EXAMPLE_TO_RUN == 2 {
         //----------------------------------------------------------------------
@@ -166,7 +166,7 @@ fn main() {
         scene.render(&mut camera);
 
         let image = PPMImage::new("example2.ppm");
-        result = image.save(&camera.image);
+        result = image.save(camera.get_image());
     } else {
         //----------------------------------------------------------------------
         // flipcode Tutorial, version 3
@@ -278,7 +278,7 @@ fn main() {
         scene.render(&mut camera);
 
         let image = PPMImage::new("example3.ppm");
-        result = image.save(&camera.image);
+        result = image.save(camera.get_image());
     }
     
     match result {

@@ -12,7 +12,6 @@ static POINT3D_ORIGIN: Point3D = Point3D {
 };
 
 pub struct Point3D {
-
     pub x: f32,
     pub y: f32,
     pub z: f32
