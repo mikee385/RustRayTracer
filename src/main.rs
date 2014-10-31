@@ -8,8 +8,9 @@ use sphere::{Sphere};
 use plane::{Plane};
 use scene_light::{SceneLight};
 
-use ppm_image::{PPMImage};
+use table::{Table};
 use camera::{Camera};
+use ppm_image::{PPMImage};
 
 use scene::{Scene};
 
@@ -23,8 +24,8 @@ mod plane;
 mod scene_light;
 
 mod table;
-mod ppm_image;
 mod camera;
+mod ppm_image;
 
 mod scene;
 
@@ -110,11 +111,12 @@ fn main() {
         let light_source = SceneLight::new(&Point3D::from_xyz(0.0, 20.0, 30.0), 3.0, &ColorRGB::from_rgb(3.0, 3.0, 3.0));
         scene.add_light_source(&light_source);
 
-        let mut camera = Camera::from_fov(width, height, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&mut camera);
+        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
+        let camera = Camera::from_fov(&pixel_table, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example1.ppm");
-        result = image.save(camera.get_image());
+        result = image.save(&pixel_table);
         
     } else if EXAMPLE_TO_RUN == 2 {
         //----------------------------------------------------------------------
@@ -162,11 +164,12 @@ fn main() {
         let light_source2 = SceneLight::new(&Point3D::from_xyz(2.0, 5.0, 1.0), 0.1, &ColorRGB::from_rgb(0.7, 0.7, 0.9));
         scene.add_light_source(&light_source2);
 
-        let mut camera = Camera::from_dimensions(width, height, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&mut camera);
+        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
+        let camera = Camera::from_dimensions(&pixel_table, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example2.ppm");
-        result = image.save(camera.get_image());
+        result = image.save(&pixel_table);
     } else {
         //----------------------------------------------------------------------
         // flipcode Tutorial, version 3
@@ -274,11 +277,12 @@ fn main() {
             scene.add_object(grid_sphere);
         }
 
-        let mut camera = Camera::from_dimensions(width, height, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&mut camera);
+        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
+        let camera = Camera::from_dimensions(&pixel_table, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example3.ppm");
-        result = image.save(camera.get_image());
+        result = image.save(&pixel_table);
     }
     
     match result {

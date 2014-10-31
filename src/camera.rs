@@ -5,10 +5,7 @@ use geometry::{DEGREES_TO_RADIANS, Point3D, Vector3D, Direction3D, Ray3D, Matrix
 use color::{ColorRGB};
 use table::{Table};
 
-const DEFAULT_COLOR: ColorRGB = ColorRGB {red: 0.0, green: 0.0, blue: 0.0};
-
-pub struct Camera {
-    image: Table<ColorRGB>,     
+pub struct Camera {   
     position: Point3D,
     orientation: Matrix3D,
     
@@ -20,36 +17,37 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn from_fov(image_width: uint, image_height: uint, field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+    pub fn from_fov(pixel_table: &Table<ColorRGB>, field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let table_width = pixel_table.get_width() as f32;
+        let table_height = pixel_table.get_height() as f32;
+
         let y_max = (field_of_view / 2.0 * DEGREES_TO_RADIANS).tan() * distance_to_plane;
-        let x_min = -y_max * (image_width as f32) / (image_height as f32);    
+        let x_min = -y_max * (table_width as f32) / (table_height as f32);
+
         Camera {
-            image: Table::from_elem(image_width, image_height, DEFAULT_COLOR),
             position: *position,
             orientation: compute_orientation(position, look_at_point),
             x_min: x_min,
             y_max: y_max,
-            dx: -2.0 * x_min / (image_width as f32),
-            dy: 2.0 * y_max / (image_height as f32),
+            dx: -2.0 * x_min / table_width,
+            dy: 2.0 * y_max / table_height,
             distance_to_plane: distance_to_plane
         }
     }
     
-    pub fn from_dimensions(image_width: uint, image_height: uint, plane_width: f32, plane_height: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+    pub fn from_dimensions(pixel_table: &Table<ColorRGB>, plane_width: f32, plane_height: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let table_width = pixel_table.get_width() as f32;
+        let table_height = pixel_table.get_height() as f32;
+
         Camera {
-            image: Table::from_elem(image_width, image_height, DEFAULT_COLOR),
             position: *position,
             orientation: compute_orientation(position, look_at_point),
             x_min: -plane_width / 2.0,
             y_max: plane_height / 2.0,
-            dx: plane_width / (image_width as f32),
-            dy: plane_height / (image_height as f32),
+            dx: plane_width / table_width,
+            dy: plane_height / table_height,
             distance_to_plane: distance_to_plane
         }
-    }
-
-    pub fn get_image(&self) -> &Table<ColorRGB> {
-        &self.image
     }
 
     pub fn get_position(&self) -> &Point3D {
@@ -77,12 +75,12 @@ impl Camera {
     pub fn get_sub_rays(&self, row: uint, column: uint, rays: &mut Table<Ray3D>) {
         let width = rays.get_width();
         if width < 2 {
-            panic!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
+            fail!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
         }
         
         let height = rays.get_height();
         if height < 2 {
-            panic!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
+            fail!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
         }
     
         let x_step = self.dx / ((width - 1) as f32);
@@ -99,14 +97,6 @@ impl Camera {
                 rays.set(row, column, Ray3D::new(&self.position, &ray_direction));
             }
         }
-    }
-    
-    pub fn get_pixel(&self, row: uint, column: uint) -> &ColorRGB {
-        self.image.get(row, column)
-    }
-    
-    pub fn set_pixel(&mut self, row: uint, column: uint, pixel: ColorRGB) {
-        self.image.set(row, column, pixel)
     }
     
     fn get_pixel_center(&self, row: uint, column: uint) -> Point3D {
