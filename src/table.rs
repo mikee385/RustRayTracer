@@ -19,10 +19,10 @@ impl<T: Clone> Table<T> {
 impl<T> Table<T> {
     fn get_index(&self, row: uint, column: uint) -> uint {
         if row >= self.height {
-            fail!("Table::get_index: `row` overflow ({} >= {})", row, self.height)
+            panic!("Table::get_index: `row` overflow ({} >= {})", row, self.height)
         }
         if column >= self.width {
-            fail!("Table::get_index: `column` overflow ({} >= {})", column, self.width)
+            panic!("Table::get_index: `column` overflow ({} >= {})", column, self.width)
         }
 
         row * self.width + column
