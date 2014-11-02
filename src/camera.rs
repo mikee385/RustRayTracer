@@ -75,12 +75,12 @@ impl Camera {
     pub fn get_sub_rays(&self, row: uint, column: uint, rays: &mut Table<Ray3D>) {
         let width = rays.get_width();
         if width < 2 {
-            fail!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
+            panic!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
         }
         
         let height = rays.get_height();
         if height < 2 {
-            fail!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
+            panic!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
         }
     
         let x_step = self.dx / ((width - 1) as f32);
