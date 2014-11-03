@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct ColorRGB {
     pub red: f32,
     pub green: f32,
@@ -13,10 +14,6 @@ static COLOR_RGB_GREEN: ColorRGB = ColorRGB {red: 0.0, green: 1.0, blue: 0.0};
 static COLOR_RGB_BLUE: ColorRGB = ColorRGB {red: 0.0, green: 0.0, blue: 1.0};
 
 impl ColorRGB {
-    //pub fn new() -> ColorRGB {
-    //    ColorRGB::from_rgb(0.0, 0.0, 0.0)
-    //}
-    
     pub fn white() -> &'static ColorRGB {
         &COLOR_RGB_WHITE
     }
@@ -83,21 +80,5 @@ impl MulColorRGB for ColorRGB {
             lhs.green * self.green,
             lhs.blue * self.blue
        )  
-    }
-}
-
-impl Clone for ColorRGB {
-    fn clone(&self) -> ColorRGB {
-        ColorRGB {
-            red: self.red,
-            green: self.green,
-            blue: self.blue
-        }
-    }
-    
-    fn clone_from(&mut self, source: &ColorRGB) {
-        self.red = source.red;
-        self.green = source.green;
-        self.blue = source.blue;
     }
 }

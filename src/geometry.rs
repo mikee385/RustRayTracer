@@ -5,17 +5,18 @@ use std::f32::consts::PI;
 pub const EPSILON: f32 = 1.0E-9;
 pub const DEGREES_TO_RADIANS: f32 = PI / 180.0;
 
-static POINT3D_ORIGIN: Point3D = Point3D {
-    x: 0.0, 
-    y: 0.0, 
-    z: 0.0
-};
-
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Point3D {
     pub x: f32,
     pub y: f32,
     pub z: f32
 }
+
+static POINT3D_ORIGIN: Point3D = Point3D {
+    x: 0.0, 
+    y: 0.0, 
+    z: 0.0
+};
 
 impl Point3D {
     pub fn from_xyz(x: f32, y: f32, z: f32) -> Point3D {
@@ -85,49 +86,11 @@ impl Point3D {
     }
 }
 
-impl Clone for Point3D {
-    fn clone(&self) -> Point3D {
-        Point3D {
-            x: self.x,
-            y: self.y,
-            z: self.z
-        }
-    }
-    
-    fn clone_from(&mut self, source: &Point3D) {
-        self.x = source.x;
-        self.y = source.y;
-        self.z = source.z;
-    }
-}
-
-impl PartialEq for Point3D {
-    fn eq(&self, other: &Point3D) -> bool {
-        self.x == other.x &&
-        self.y == other.y &&
-        self.z == other.z
-    }
-}
-
-impl PartialOrd for Point3D {
-    fn partial_cmp(&self, other: &Point3D) -> Option<Ordering> {
-        match self.x.partial_cmp(&other.x) {
-            Some(Less) => Some(Less),
-            Some(Greater) => Some(Greater),
-            Some(Equal) => match self.y.partial_cmp(&other.y) {
-                Some(Less) => Some(Less),
-                Some(Greater) => Some(Greater),
-                Some(Equal) => match self.z.partial_cmp(&other.z) {
-                    Some(Less) => Some(Less),
-                    Some(Greater) => Some(Greater),
-                    Some(Equal) => Some(Equal),
-                    None => None
-                },
-                None => None
-            },
-            None => None
-        }
-    }
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
+pub struct Vector3D {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32
 }
 
 static VECTOR3D_ZERO: Vector3D = Vector3D {
@@ -135,12 +98,6 @@ static VECTOR3D_ZERO: Vector3D = Vector3D {
     y: 0.0, 
     z: 0.0
 };
-
-pub struct Vector3D {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32
-}
 
 impl Vector3D {
     pub fn from_xyz(x: f32, y: f32, z: f32) -> Vector3D {
@@ -236,22 +193,6 @@ impl Vector3D {
     }
 }
 
-impl Clone for Vector3D {
-    fn clone(&self) -> Vector3D {
-        Vector3D {
-            x: self.x,
-            y: self.y,
-            z: self.z
-        }
-    }
-    
-    fn clone_from(&mut self, source: &Vector3D) {
-        self.x = source.x;
-        self.y = source.y;
-        self.z = source.z;
-    }
-}
-
 impl Add<Vector3D, Vector3D> for Vector3D {
     fn add(&self, other: &Vector3D) -> Vector3D {
         Vector3D::from_xyz(
@@ -295,33 +236,9 @@ impl Neg<Vector3D> for Vector3D {
     }
 }
 
-impl PartialEq for Vector3D {
-    fn eq(&self, other: &Vector3D) -> bool {
-        self.x == other.x &&
-        self.y == other.y &&
-        self.z == other.z
-    }
-}
-
-impl PartialOrd for Vector3D {
-    fn partial_cmp(&self, other: &Vector3D) -> Option<Ordering> {
-        match self.x.partial_cmp(&other.x) {
-            Some(Less) => Some(Less),
-            Some(Greater) => Some(Greater),
-            Some(Equal) => match self.y.partial_cmp(&other.y) {
-                Some(Less) => Some(Less),
-                Some(Greater) => Some(Greater),
-                Some(Equal) => match self.z.partial_cmp(&other.z) {
-                    Some(Less) => Some(Less),
-                    Some(Greater) => Some(Greater),
-                    Some(Equal) => Some(Equal),
-                    None => None
-                },
-                None => None
-            },
-            None => None
-        }
-    }
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
+pub struct Direction3D {
+    direction: Vector3D
 }
 
 static DIRECTION3D_UNIT_X: Direction3D = Direction3D {
@@ -333,10 +250,6 @@ static DIRECTION3D_UNIT_Y: Direction3D = Direction3D {
 static DIRECTION3D_UNIT_Z: Direction3D = Direction3D {
     direction: Vector3D {x: 0.0, y: 0.0, z: 1.0}
 };
-
-pub struct Direction3D {
-    direction: Vector3D
-}
 
 impl Direction3D {
     pub fn from_xyz(x: f32, y: f32, z: f32) -> Direction3D {
@@ -451,51 +364,13 @@ impl Direction3D {
     }
 }
 
-impl Clone for Direction3D {
-    fn clone(&self) -> Direction3D {
-        Direction3D {
-            direction: self.direction
-        }
-    }
-    
-    fn clone_from(&mut self, source: &Direction3D) {
-        self.direction = source.direction;
-    }
-}
-
 impl Neg<Direction3D> for Direction3D {
     fn neg(&self) -> Direction3D {
         Direction3D::from_normalized_vector(&self.as_vector().neg())
     }
 }
 
-impl PartialEq for Direction3D {
-    fn eq(&self, other: &Direction3D) -> bool {
-        self.as_vector().eq(other.as_vector())
-    }
-}
-
-impl PartialOrd for Direction3D {
-    fn partial_cmp(&self, other: &Direction3D) -> Option<Ordering> {
-        match self.x().partial_cmp(&other.x()) {
-            Some(Less) => Some(Less),
-            Some(Greater) => Some(Greater),
-            Some(Equal) => match self.y().partial_cmp(&other.y()) {
-                Some(Less) => Some(Less),
-                Some(Greater) => Some(Greater),
-                Some(Equal) => match self.z().partial_cmp(&other.z()) {
-                    Some(Less) => Some(Less),
-                    Some(Greater) => Some(Greater),
-                    Some(Equal) => Some(Equal),
-                    None => None
-                },
-                None => None
-            },
-            None => None
-        }
-    }
-}
-
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Ray3D {
     pub origin: Point3D,
     pub direction: Direction3D
@@ -514,41 +389,11 @@ impl Ray3D {
     }
 }
 
-impl Clone for Ray3D {
-    fn clone(&self) -> Ray3D {
-        Ray3D {
-            origin: self.origin,
-            direction: self.direction
-        }
-    }
-    
-    fn clone_from(&mut self, source: &Ray3D) {
-        self.origin = source.origin;
-        self.direction = source.direction;
-    }
-}
-
-impl PartialEq for Ray3D {
-    fn eq(&self, other: &Ray3D) -> bool {
-        self.origin.eq(&other.origin) &&
-        self.direction.eq(&other.direction)
-    }
-}
-
-impl PartialOrd for Ray3D {
-    fn partial_cmp(&self, other: &Ray3D) -> Option<Ordering> {
-        match self.origin.partial_cmp(&other.origin) {
-            Some(Less) => Some(Less),
-            Some(Greater) => Some(Greater),
-            Some(Equal) => match self.direction.partial_cmp(&other.direction) {
-                Some(Less) => Some(Less),
-                Some(Greater) => Some(Greater),
-                Some(Equal) => Some(Equal),
-                None => None
-            },
-            None => None
-        }
-    }
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
+pub struct Matrix3D {
+    pub x: Vector3D,
+    pub y: Vector3D,
+    pub z: Vector3D
 }
 
 static MATRIX3D_IDENTITY: Matrix3D = Matrix3D {
@@ -556,12 +401,6 @@ static MATRIX3D_IDENTITY: Matrix3D = Matrix3D {
     y: Vector3D {x: 0.0, y: 1.0, z: 0.0},
     z: Vector3D {x: 0.0, y: 0.0, z: 1.0}
 };
-
-pub struct Matrix3D {
-    pub x: Vector3D,
-    pub y: Vector3D,
-    pub z: Vector3D
-}
 
 impl Matrix3D {
     pub fn new(x: &Vector3D, y: &Vector3D, z: &Vector3D) -> Matrix3D {
@@ -587,50 +426,5 @@ impl Matrix3D {
         let vec_z = unit_z.as_vector();
 
         Matrix3D::new(vec_x, vec_y, vec_z)
-    }
-}
-
-impl Clone for Matrix3D {
-    fn clone(&self) -> Matrix3D {
-        Matrix3D {
-            x: self.x,
-            y: self.y,
-            z: self.z
-        }
-    }
-    
-    fn clone_from(&mut self, source: &Matrix3D) {
-        self.x = source.x;
-        self.y = source.y;
-        self.z = source.z;
-    }
-}
-
-impl PartialEq for Matrix3D {
-    fn eq(&self, other: &Matrix3D) -> bool {
-        self.x.eq(&other.x) &&
-        self.y.eq(&other.y) &&
-        self.z.eq(&other.z)
-    }
-}
-
-impl PartialOrd for Matrix3D {
-    fn partial_cmp(&self, other: &Matrix3D) -> Option<Ordering> {
-        match self.x.partial_cmp(&other.x) {
-            Some(Less) => Some(Less),
-            Some(Greater) => Some(Greater),
-            Some(Equal) => match self.y.partial_cmp(&other.y) {
-                Some(Less) => Some(Less),
-                Some(Greater) => Some(Greater),
-                Some(Equal) => match self.z.partial_cmp(&other.z) {
-                    Some(Less) => Some(Less),
-                    Some(Greater) => Some(Greater),
-                    Some(Equal) => Some(Equal),
-                    None => None
-                },
-                None => None
-            },
-            None => None
-        }
     }
 }

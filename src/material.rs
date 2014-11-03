@@ -1,5 +1,6 @@
 use color::ColorRGB;
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Material {
     pub color: ColorRGB,
     pub diffuse: f32,
