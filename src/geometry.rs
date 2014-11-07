@@ -149,7 +149,7 @@ impl Vector3D {
     }
     
     pub fn projection_dir(&self, direction: &Direction3D) -> Vector3D {
-        direction.as_vector() * Vector3D::dot(self, direction.as_vector())
+        direction.to_vector() * Vector3D::dot(self, direction.as_vector())
     }
     
     pub fn projection_vec(&self, direction: &Vector3D) -> Vector3D {
@@ -417,14 +417,14 @@ impl Matrix3D {
     
     pub fn to_orthonormal_basis(&self) -> Matrix3D {
         let unit_x = self.x.to_unit();
-        let vec_x = unit_x.as_vector();
+        let vec_x = unit_x.to_vector();
         
-        let unit_y = (self.y - vec_x * Vector3D::dot(vec_x, &self.y)).to_unit();
-        let vec_y = unit_y.as_vector();
+        let unit_y = (self.y - vec_x * Vector3D::dot(&vec_x, &self.y)).to_unit();
+        let vec_y = unit_y.to_vector();
         
-        let unit_z = (self.z - vec_x * Vector3D::dot(vec_x, &self.z) - vec_y * Vector3D::dot(vec_y, &self.z)).to_unit();
-        let vec_z = unit_z.as_vector();
+        let unit_z = (self.z - vec_x * Vector3D::dot(&vec_x, &self.z) - vec_y * Vector3D::dot(&vec_y, &self.z)).to_unit();
+        let vec_z = unit_z.to_vector();
 
-        Matrix3D::new(vec_x, vec_y, vec_z)
+        Matrix3D::new(&vec_x, &vec_y, &vec_z)
     }
 }

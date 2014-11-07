@@ -22,7 +22,7 @@ impl Plane {
     
     pub fn from_d_vector(d: f32, vector: &Vector3D, material: &Material) -> Plane {
         Plane {
-            origin: Point3D::from_vector(&(vector * (-d / Vector3D::dot(vector, vector)))),
+            origin: Point3D::from_vector(&(*vector * (-d / Vector3D::dot(vector, vector)))),
             normal: Direction3D::from_vector(vector),
             material: *material
         }
