@@ -52,12 +52,12 @@ impl<'a> Scene<'a> {
     }
     
     pub fn render(&self, camera: &Camera, pixel_table: &mut Table<ColorRGB>) {
-        let width = pixel_table.get_width();
-        let height = pixel_table.get_height();
+        let dimensions = pixel_table.get_dimensions();
+        let (width, height) = dimensions;
         
         // Initial Pixel Coloring
-        for ((row, column), value) in pixel_table.iter_mut().enumerate_2d() {
-            let ray = camera.get_primary_ray(row, column);
+        for (index, value) in pixel_table.iter_mut().enumerate_2d() {
+            let ray = camera.get_primary_ray(index);
             let result = self.trace(&ray, 0);
             
             let result_color = ColorRGB::from_rgb(
@@ -69,26 +69,27 @@ impl<'a> Scene<'a> {
         }
         
         // Edge Detection
-        let mut is_edge = Table::from_elem(width, height, false);
-        for row in range(1, height-1) {
-            for column in range (1, width-1) {
-                let p1 = pixel_table.get(row - 1, column - 1);
-                let p2 = pixel_table.get(row - 1, column);
-                let p3 = pixel_table.get(row - 1, column + 1);
-                let p4 = pixel_table.get(row, column - 1);
-                let p6 = pixel_table.get(row, column + 1);
-                let p7 = pixel_table.get(row + 1, column - 1);
-                let p8 = pixel_table.get(row + 1, column);
-                let p9 = pixel_table.get(row + 1, column + 1);
+        let mut is_edge = Table::from_elem(dimensions, false);
+        for (index, value) in is_edge.iter_mut().enumerate_2d() {
+            let (row, column) = index;
+            if row != 0 && column != 0 && row != height-1 && column != width-1 {
+                let p1 = pixel_table.get((row - 1, column - 1));
+                let p2 = pixel_table.get((row - 1, column));
+                let p3 = pixel_table.get((row - 1, column + 1));
+                let p4 = pixel_table.get((row, column - 1));
+                let p6 = pixel_table.get((row, column + 1));
+                let p7 = pixel_table.get((row + 1, column - 1));
+                let p8 = pixel_table.get((row + 1, column));
+                let p9 = pixel_table.get((row + 1, column + 1));
 
                 let r = calculate_gradient(p1.red, p2.red, p3.red, p4.red, p6.red, p7.red, p8.red, p9.red);
                 let g = calculate_gradient(p1.green, p2.green, p3.green, p4.green, p6.green, p7.green, p8.green, p9.green);
                 let b = calculate_gradient(p1.blue, p2.blue, p3.blue, p4.blue, p6.blue, p7.blue, p8.blue, p9.blue);
 
                 if (r + b + g) > 0.5 {
-                    is_edge.set(row, column, true);
+                    *value = true;
                 } else {
-                    is_edge.set(row, column, false);
+                    *value = false;
                 }
             }
         }
@@ -97,22 +98,20 @@ impl<'a> Scene<'a> {
         let sub_width = 3;
         let sub_height = 3;
         let sub_size = (sub_width * sub_height) as f32;
-        let mut sub_rays = Table::from_elem(sub_width, sub_height, Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
-        for ((row, column), value) in pixel_table.iter_mut().enumerate_2d() {
-            if *is_edge.get(row, column) {
+        let mut sub_rays = Table::from_elem((sub_width, sub_height), Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
+        for (index, value) in pixel_table.iter_mut().enumerate_2d() {
+            if *is_edge.get(index) {
                 let mut pixel_color = *ColorRGB::black();
                 
-                camera.get_sub_rays(row, column, &mut sub_rays);
-                for sub_row in range(0, sub_height) {
-                    for sub_column in range(0, sub_width) {
-                        let result = self.trace(sub_rays.get(sub_row, sub_column), 0);
-                        
-                        pixel_color = ColorRGB::from_rgb(
-                            pixel_color.red + result.color.red / sub_size,
-                            pixel_color.green + result.color.green / sub_size,
-                            pixel_color.blue + result.color.blue / sub_size
-                        );
-                    }
+                camera.get_sub_rays(index, &mut sub_rays);
+                for sub_ray in sub_rays.iter() {
+                    let result = self.trace(sub_ray, 0);
+                    
+                    pixel_color = ColorRGB::from_rgb(
+                        pixel_color.red + result.color.red / sub_size,
+                        pixel_color.green + result.color.green / sub_size,
+                        pixel_color.blue + result.color.blue / sub_size
+                    );
                 }
                 *value = pixel_color;
             }

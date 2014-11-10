@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
 use geometry::{EPSILON, Point3D, Vector3D, Direction3D, Ray3D};
 use material::{Material};
@@ -52,11 +51,11 @@ impl SceneObject for Plane {
         Some(t)
     }
     
-    fn get_normal(&self, point: &Point3D) -> Direction3D {
+    fn get_normal(&self, _: &Point3D) -> Direction3D {
         self.normal
     }
     
-    fn get_material(&self, point: &Point3D) -> Material {
+    fn get_material(&self, _: &Point3D) -> Material {
         self.material
     }
 }

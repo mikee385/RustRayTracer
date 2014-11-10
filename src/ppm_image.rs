@@ -18,8 +18,7 @@ impl PPMImage {
         let file_path = Path::new(self.file_name.as_slice());
         let mut file = try!(File::open_mode(&file_path, Open, Write));
 
-        let width = image.get_width();
-        let height = image.get_height();
+        let (width, height) = image.get_dimensions();
 
         try!(file.write_line("P6"));
         try!(file.write_uint(width));
@@ -27,19 +26,15 @@ impl PPMImage {
         try!(file.write_uint(height));
         try!(file.write_line(""));
         try!(file.write_line("255"));
-        
-        for row in range(0, height) {
-            for column in range(0, width) {
-                let pixel = image.get(row, column);
-                
-                let red = convert_to_u8(pixel.red);
-                let green = convert_to_u8(pixel.green);
-                let blue = convert_to_u8(pixel.blue);
-                
-                try!(file.write_u8(red));
-                try!(file.write_u8(green));
-                try!(file.write_u8(blue));
-            }
+
+        for pixel in image.iter() {                
+            let red = convert_to_u8(pixel.red);
+            let green = convert_to_u8(pixel.green);
+            let blue = convert_to_u8(pixel.blue);
+            
+            try!(file.write_u8(red));
+            try!(file.write_u8(green));
+            try!(file.write_u8(blue));
         }
         Ok(())
     }

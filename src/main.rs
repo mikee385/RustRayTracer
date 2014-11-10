@@ -41,8 +41,7 @@ fn main() {
         // Scratchapixel Tutorial
         //----------------------------------------------------------------------
     
-        let width: uint = 640;
-        let height: uint = 480;
+        let dimensions = (640, 480);
         let field_of_view: f32 = 30.0;
         
         let background_color = ColorRGB::from_rgb(2.0, 2.0, 2.0);
@@ -111,8 +110,8 @@ fn main() {
         let light_source = SceneLight::new(&Point3D::from_xyz(0.0, 20.0, 30.0), 3.0, &ColorRGB::from_rgb(3.0, 3.0, 3.0));
         scene.add_light_source(&light_source);
 
-        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
-        let camera = Camera::from_fov(&pixel_table, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
+        let camera = Camera::from_fov(dimensions, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
         scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example1.ppm");
@@ -123,8 +122,7 @@ fn main() {
         // flipcode Tutorial, version 1 & version 2
         //----------------------------------------------------------------------
 
-        let width: uint = 800;
-        let height: uint = 600;
+        let dimensions = (800, 600);
 
         let mut scene = Scene::new(ColorRGB::black(), 1.0, 5);
 
@@ -164,8 +162,8 @@ fn main() {
         let light_source2 = SceneLight::new(&Point3D::from_xyz(2.0, 5.0, 1.0), 0.1, &ColorRGB::from_rgb(0.7, 0.7, 0.9));
         scene.add_light_source(&light_source2);
 
-        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
-        let camera = Camera::from_dimensions(&pixel_table, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
+        let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
         scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example2.ppm");
@@ -175,8 +173,7 @@ fn main() {
         // flipcode Tutorial, version 3
         //----------------------------------------------------------------------
     
-        let width: uint = 800;
-        let height: uint = 600;
+        let dimensions = (800, 600);
 
         let mut scene = Scene::new(ColorRGB::black(), 1.0, 5);
 
@@ -277,8 +274,8 @@ fn main() {
             scene.add_object(grid_sphere);
         }
 
-        let mut pixel_table = Table::from_elem(width, height, *ColorRGB::black());
-        let camera = Camera::from_dimensions(&pixel_table, 8.0, 6.0, 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
+        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
+        let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
         scene.render(&camera, &mut pixel_table);
 
         let image = PPMImage::new("example3.ppm");

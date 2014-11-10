@@ -1,8 +1,6 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
 use geometry::{DEGREES_TO_RADIANS, Point3D, Vector3D, Direction3D, Ray3D, Matrix3D};
-use color::{ColorRGB};
 use table::{Table};
 
 pub struct Camera {   
@@ -17,12 +15,13 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn from_fov(pixel_table: &Table<ColorRGB>, field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let table_width = pixel_table.get_width() as f32;
-        let table_height = pixel_table.get_height() as f32;
+    pub fn from_fov(table_dimensions: (uint, uint), field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (table_width_uint, table_height_uint) = table_dimensions;
+        let table_width = table_width_uint as f32;
+        let table_height = table_height_uint as f32;
 
         let y_max = (field_of_view / 2.0 * DEGREES_TO_RADIANS).tan() * distance_to_plane;
-        let x_min = -y_max * (table_width as f32) / (table_height as f32);
+        let x_min = -y_max * table_width / table_height;
 
         Camera {
             position: *position,
@@ -35,9 +34,12 @@ impl Camera {
         }
     }
     
-    pub fn from_dimensions(pixel_table: &Table<ColorRGB>, plane_width: f32, plane_height: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let table_width = pixel_table.get_width() as f32;
-        let table_height = pixel_table.get_height() as f32;
+    pub fn from_dimensions(table_dimensions: (uint, uint), plane_dimensions: (f32, f32), distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (table_width_uint, table_height_uint) = table_dimensions;
+        let table_width = table_width_uint as f32;
+        let table_height = table_height_uint as f32;
+
+        let (plane_width, plane_height) = plane_dimensions;
 
         Camera {
             position: *position,
@@ -57,31 +59,22 @@ impl Camera {
     pub fn get_orientation(&self) -> &Matrix3D {
         &self.orientation
     }
-
-    pub fn set_position(&mut self, position: &Point3D) {
-        self.position = *position
-    }
-
-    pub fn set_orientation(&mut self, orientation: &Matrix3D) {
-        self.orientation = *orientation
-    }
     
-    pub fn get_primary_ray(&self, row: uint, column: uint) -> Ray3D {
-        let point_in_camera = self.get_pixel_center(row, column);
+    pub fn get_primary_ray(&self, index: (uint, uint)) -> Ray3D {
+        let point_in_camera = self.get_pixel_center(index);
         let ray_direction = Direction3D::between_points(&self.position, &self.convert_camera_to_world(&point_in_camera));
         Ray3D::new(&self.position, &ray_direction)
     }
     
-    pub fn get_sub_rays(&self, row: uint, column: uint, rays: &mut Table<Ray3D>) {
-        let width = rays.get_width();
+    pub fn get_sub_rays(&self, index: (uint, uint), rays: &mut Table<Ray3D>) {
+        let (width, height) = rays.get_dimensions();
         if width < 2 {
             panic!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
         }
-        
-        let height = rays.get_height();
         if height < 2 {
             panic!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
         }
+        let (row, column) = index;
     
         let x_step = self.dx / ((width - 1) as f32);
         let y_step = self.dy / ((height - 1) as f32);
@@ -90,16 +83,15 @@ impl Camera {
         let y0 = self.y_max - self.dy * (row as f32);
         let z0 = self.distance_to_plane;
 
-        for row in range(0, height) {
-            for column in range(0, width) {
+        for ((row, column), value) in rays.iter_mut().enumerate_2d() {
                 let point_in_camera = Point3D::from_xyz(x0 + (column as f32)*x_step, y0 - (row as f32)*y_step, z0);
                 let ray_direction = Direction3D::between_points(&self.position, &self.convert_camera_to_world(&point_in_camera));
-                rays.set(row, column, Ray3D::new(&self.position, &ray_direction));
-            }
+                *value = Ray3D::new(&self.position, &ray_direction);
         }
     }
     
-    fn get_pixel_center(&self, row: uint, column: uint) -> Point3D {
+    fn get_pixel_center(&self, index: (uint, uint)) -> Point3D {
+        let (row, column) = index;
         let x = self.x_min + self.dx * ((column as f32) + 0.5);
         let y = self.y_max - self.dy * ((row as f32) + 0.5);
         let z = self.distance_to_plane;

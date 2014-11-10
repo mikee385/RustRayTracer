@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use material::{Material};
@@ -57,7 +56,7 @@ impl SceneObject for Sphere {
         Direction3D::between_points(&self.center, point)
     }
     
-    fn get_material(&self, point: &Point3D) -> Material {
+    fn get_material(&self, _: &Point3D) -> Material {
         self.material
     }
 }
