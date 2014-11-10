@@ -56,59 +56,58 @@ impl<T> Table<T> {
     }
 
     #[inline]
-    pub fn iter<'a>(&'a self) -> TableItems<'a, T> {
+    pub fn iter<'a>(&'a self) -> TableItems<Items<'a, T>> {
+        self.data.iter().as_table(self.width, self.height)
+    }
+
+    #[inline]
+    pub fn iter_mut<'a>(&'a mut self) -> TableItems<MutItems<'a, T>> {
+        self.data.iter_mut().as_table(self.width, self.height)
+    }
+
+    #[inline]
+    pub fn as_slice<'a>(&'a self) -> &'a [T] {
+        self.data.as_slice()
+    }
+
+    #[inline]
+    pub fn as_mut_slice<'a>(&'a mut self) -> &'a mut [T] {
+        self.data.as_mut_slice()
+    }
+}
+
+pub struct TableItems<T> {
+    iter: T,
+    width: uint,
+    height: uint
+}
+
+impl<A, T: Iterator<A>> Iterator<A> for TableItems<T> {
+    #[inline]
+    fn next(&mut self) -> Option<A> {
+        self.iter.next()
+    }
+}
+
+pub trait AsTable<'a, T> {
+    fn as_table(self, width: uint, height: uint) -> TableItems<Self> {
         TableItems {
-            iter: self.data.iter(),
-            width: self.width,
-            height: self.height
-        }
-    }
-
-    #[inline]
-    pub fn iter_mut<'a>(&'a mut self) -> MutTableItems<'a, T> {
-        MutTableItems {
-            iter: self.data.iter_mut(),
-            width: self.width,
-            height: self.height
+            iter: self,
+            width: width,
+            height: height
         }
     }
 }
 
-pub struct TableItems<'a, T: 'a> {
-    iter: Items<'a, T>,
-    width: uint,
-    height: uint
-}
-
-impl<'a, T> Iterator<&'a T> for TableItems<'a, T> {
-    #[inline]
-    fn next(&mut self) -> Option<&'a T> {
-        self.iter.next()
-    }
-}
-
-pub struct MutTableItems<'a, T: 'a> {
-    iter: MutItems<'a, T>,
-    width: uint,
-    height: uint
-}
-
-impl<'a, T> Iterator<&'a mut T> for MutTableItems<'a, T> {
-    #[inline]
-    fn next(&mut self) -> Option<&'a mut T> {
-        self.iter.next()
-    }
-}
+impl<'a, A, T: Iterator<A>> AsTable<'a, T> for T {}
 
 pub struct TableEnumerate<T> {
     iter: T,
-    height: uint,
-    width: uint,
     row_count: uint,
     column_count: uint
 }
 
-impl<'a, A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<T> {
+impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableItems<T>> {
     #[inline]
     fn next(&mut self) -> Option<((uint, uint), A)> {
         match self.iter.next() {
@@ -116,7 +115,7 @@ impl<'a, A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<T> {
                 let ret = Some(((self.row_count, self.column_count), value));
 
                 self.column_count += 1;
-                if self.column_count == self.width {
+                if self.column_count == self.iter.width {
                     self.row_count += 1;
                     self.column_count = 0;
                 }
@@ -132,32 +131,33 @@ impl<'a, A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<T> {
     }
 }
 
-impl<'a, T> TableItems<'a, T> {
-    pub fn enumerate_2d(self) -> TableEnumerate<TableItems<'a, T>> {
-        let width = self.width;
-        let height = self.height;
-
+impl<T> TableItems<T> {
+    pub fn enumerate_2d(self) -> TableEnumerate<TableItems<T>> {
         TableEnumerate {
             iter: self,
-            width: width,
-            height: height,
             row_count: 0,
             column_count: 0
         }
     }
-}
 
-impl<'a, T> MutTableItems<'a, T> {
-    pub fn enumerate_2d(self) -> TableEnumerate<MutTableItems<'a, T>> {
-        let width = self.width;
-        let height = self.height;
+    pub fn enumerate_2d_from(self, start: (uint, uint)) -> TableEnumerate<TableItems<T>> {
+        let (row_start, column_start) = start;
 
         TableEnumerate {
             iter: self,
-            width: width,
-            height: height,
-            row_count: 0,
-            column_count: 0
+            row_count: row_start,
+            column_count: column_start
+        }
+    }
+
+    pub fn enumerate_2d_from_index(self, index: uint) -> TableEnumerate<TableItems<T>> {
+        let row_start = index / self.width;
+        let column_start = index % self.width;
+
+        TableEnumerate {
+            iter: self,
+            row_count: row_start,
+            column_count: column_start
         }
     }
 }
