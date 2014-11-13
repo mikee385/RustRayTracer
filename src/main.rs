@@ -1,6 +1,6 @@
 extern crate time;
 
-use geometry::{Point3D, Vector3D};
+use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use color::{ColorRGB};
 use material::{MaterialBuilder};
 
@@ -112,7 +112,8 @@ fn main() {
 
         let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
         let camera = Camera::from_fov(dimensions, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&camera, &mut pixel_table);
+        
+        render(&scene, &camera, &mut pixel_table);
 
         let image = PPMImage::new("example1.ppm");
         result = image.save(&pixel_table);
@@ -164,7 +165,8 @@ fn main() {
 
         let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
         let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&camera, &mut pixel_table);
+        
+        render(&scene, &camera, &mut pixel_table);
 
         let image = PPMImage::new("example2.ppm");
         result = image.save(&pixel_table);
@@ -276,7 +278,8 @@ fn main() {
 
         let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
         let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        scene.render(&camera, &mut pixel_table);
+
+        render(&scene, &camera, &mut pixel_table);
 
         let image = PPMImage::new("example3.ppm");
         result = image.save(&pixel_table);
@@ -292,4 +295,78 @@ fn main() {
     let end = time::precise_time_ns();
     let elapsed = (end - start) / 1000000;
     println!("Elapsed time: {}", elapsed);
+}
+    
+fn render(scene: &Scene, camera: &Camera, pixel_table: &mut Table<ColorRGB>) {
+    let dimensions = pixel_table.get_dimensions();
+    let (width, height) = dimensions;
+    
+    // Initial Pixel Coloring
+    for (index, value) in pixel_table.iter_mut().enumerate_2d() {
+        let ray = camera.get_primary_ray(index);
+        let result = scene.trace(&ray, 0);
+        
+        let result_color = ColorRGB::from_rgb(
+            result.color.red.min(1.0),
+            result.color.green.min(1.0),
+            result.color.blue.min(1.0)
+        );
+        *value = result_color;
+    }
+    
+    // Edge Detection
+    let mut is_edge = Table::from_elem(dimensions, false);
+    for (index, value) in is_edge.iter_mut().enumerate_2d() {
+        let (row, column) = index;
+        if row != 0 && column != 0 && row != height-1 && column != width-1 {
+            let p1 = pixel_table.get((row - 1, column - 1));
+            let p2 = pixel_table.get((row - 1, column));
+            let p3 = pixel_table.get((row - 1, column + 1));
+            let p4 = pixel_table.get((row, column - 1));
+            let p6 = pixel_table.get((row, column + 1));
+            let p7 = pixel_table.get((row + 1, column - 1));
+            let p8 = pixel_table.get((row + 1, column));
+            let p9 = pixel_table.get((row + 1, column + 1));
+
+            let r = calculate_gradient(p1.red, p2.red, p3.red, p4.red, p6.red, p7.red, p8.red, p9.red);
+            let g = calculate_gradient(p1.green, p2.green, p3.green, p4.green, p6.green, p7.green, p8.green, p9.green);
+            let b = calculate_gradient(p1.blue, p2.blue, p3.blue, p4.blue, p6.blue, p7.blue, p8.blue, p9.blue);
+
+            if (r + b + g) > 0.5 {
+                *value = true;
+            } else {
+                *value = false;
+            }
+        }
+    }
+
+    // Anti-aliasing
+    let sub_width = 3;
+    let sub_height = 3;
+    let sub_size = (sub_width * sub_height) as f32;
+    let mut sub_rays = Table::from_elem((sub_width, sub_height), Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
+    for (index, value) in pixel_table.iter_mut().enumerate_2d() {
+        if *is_edge.get(index) {
+            let mut pixel_color = *ColorRGB::black();
+            
+            camera.get_sub_rays(index, &mut sub_rays);
+            for sub_ray in sub_rays.iter() {
+                let result = scene.trace(sub_ray, 0);
+                
+                pixel_color = ColorRGB::from_rgb(
+                    pixel_color.red + result.color.red / sub_size,
+                    pixel_color.green + result.color.green / sub_size,
+                    pixel_color.blue + result.color.blue / sub_size
+                );
+            }
+            *value = pixel_color;
+        }
+    }
+}
+
+fn calculate_gradient(p1: f32, p2: f32, p3: f32, p4: f32, p6: f32, p7: f32, p8: f32, p9: f32) -> f32
+{
+    let gx = (p3 + 2.0 * p6 + p9) - (p1 + 2.0 * p4 + p7);
+    let gy = (p1 + 2.0 * p2 + p3) - (p7 + 2.0 * p8 + p9);
+    (gx*gx + gy*gy).sqrt()
 }
