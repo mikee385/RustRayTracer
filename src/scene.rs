@@ -7,16 +7,16 @@ use scene_light::{SceneLight};
 
 const BIAS: f32 = 1.0e-4;
 
-pub struct Scene<'a> {
+pub struct Scene {
     background_color: ColorRGB,
     refractive_index: f32,
     max_ray_depth: u32,
     
-    items: Vec<InternalObject<'a>>,
-    lights: Vec<InternalLight<'a>>
+    items: Vec<InternalObject>,
+    lights: Vec<InternalLight>
 }
 
-impl<'a> Scene<'a> {
+impl Scene {
     pub fn new(background_color: &ColorRGB, refractive_index: f32, max_ray_depth: u32) -> Scene {
         Scene {
             background_color: *background_color,
@@ -27,11 +27,11 @@ impl<'a> Scene<'a> {
         }
     }
     
-    pub fn add_light_source(&mut self, light: &'a SceneLight) {
+    pub fn add_light_source(&mut self, light: Box<SceneLight>) {
         let index = self.items.len();
         self.items.push(InternalObject {
             index: index,
-            object: light, 
+            object: light.clone(), 
             is_light: true
         });
         self.lights.push(InternalLight {
@@ -40,7 +40,7 @@ impl<'a> Scene<'a> {
         });
     }
     
-    pub fn add_object(&mut self, object: &'a SceneObject) {
+    pub fn add_object(&mut self, object: Box<SceneObject+Sync+Send>) {
         let index = self.items.len();
         self.items.push(InternalObject {
             index: index,
@@ -145,7 +145,7 @@ impl<'a> Scene<'a> {
         
         // Calculate the color from each light in the scene.
         for light_item in self.lights.iter() {
-            let light = light_item.light;
+            let light = &light_item.light;
             let light_color = light.get_material(&point).color;
             let vector_to_light = Vector3D::between_points(&point, light.get_center());
             let distance_to_light = vector_to_light.magnitude();
@@ -199,15 +199,15 @@ impl<'a> Scene<'a> {
     }
 }
 
-struct InternalObject<'a> {
+struct InternalObject {
     pub index: uint,
-    pub object: &'a SceneObject + 'a,
+    pub object: Box<SceneObject+Sync+Send>,
     pub is_light: bool
 }
 
-struct InternalLight<'a> {
+struct InternalLight {
     pub index: uint,
-    pub light: &'a SceneLight
+    pub light: Box<SceneLight>
 }
 
 pub struct TraceResult {

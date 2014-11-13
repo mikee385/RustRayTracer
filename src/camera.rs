@@ -3,6 +3,7 @@
 use geometry::{DEGREES_TO_RADIANS, Point3D, Vector3D, Direction3D, Ray3D, Matrix3D};
 use table::{Table};
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Camera {   
     position: Point3D,
     orientation: Matrix3D,

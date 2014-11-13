@@ -6,6 +6,7 @@ use material::{Material};
 use scene_object::{SceneObject};
 use sphere::{Sphere};
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct SceneLight {
     sphere: Sphere
 }

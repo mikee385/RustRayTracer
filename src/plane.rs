@@ -4,6 +4,7 @@ use geometry::{EPSILON, Point3D, Vector3D, Direction3D, Ray3D};
 use material::{Material};
 use scene_object::{SceneObject};
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Plane {
     origin: Point3D,
     normal: Direction3D,

@@ -4,6 +4,7 @@ use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use material::{Material};
 use scene_object::{SceneObject};
 
+#[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct Sphere {
     center: Point3D,
     radius: f32,
