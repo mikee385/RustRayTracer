@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use geometry::{Point3D};
+use geometry::{Point3D, Direction3D, Ray3D};
 use color::{ColorRGB};
 use material::{Material};
 use scene_object::{SceneObject};
@@ -24,12 +24,18 @@ impl SceneLight {
     pub fn get_radius(&self) -> f32 {
         self.sphere.get_radius()
     }
-    
-    pub fn get_material(&self, point: &Point3D) -> Material {
-        self.sphere.get_material(point)
+}
+
+impl SceneObject for SceneLight {
+    fn intersect(&self, ray: &Ray3D) -> Option<f32> {
+        self.sphere.intersect(ray)
     }
     
-    pub fn as_scene_object(&self) -> &SceneObject {
-        &self.sphere
+    fn get_normal(&self, point: &Point3D) -> Direction3D {
+        self.sphere.get_normal(point)
+    }
+    
+    fn get_material(&self, point: &Point3D) -> Material {
+        self.sphere.get_material(point)
     }
 }
