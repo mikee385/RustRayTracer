@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-use std::f32::consts::PI;
+use std::f32::consts::{PI};
+use std::num::{Float};
 
 pub const EPSILON: f32 = 1.0E-9;
 pub const DEGREES_TO_RADIANS: f32 = PI / 180.0;

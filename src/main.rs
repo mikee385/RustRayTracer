@@ -1,5 +1,7 @@
 extern crate time;
 
+use std::num::{Float, FloatMath};
+
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use color::{ColorRGB};
 use material::{MaterialBuilder};

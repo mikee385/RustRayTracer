@@ -1,3 +1,4 @@
+use std::num::{Float};
 use std::vec::{Vec};
 
 use geometry::{Vector3D, Ray3D};
