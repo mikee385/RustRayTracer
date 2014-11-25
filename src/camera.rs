@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::num::{Float, FloatMath};
+use std::num::{FloatMath};
 
 use geometry::{DEGREES_TO_RADIANS, Point3D, Vector3D, Direction3D, Ray3D, Matrix3D};
 use table::{Table};
