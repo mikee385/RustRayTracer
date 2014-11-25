@@ -363,6 +363,12 @@ impl Direction3D {
             return Matrix3D::new(&unit_x, &unit_y, unit_z);
         }
     }
+    
+    pub fn eq_tol(&self, other: &Direction3D, tolerance: f32) -> bool {
+        (self.x - other.x).abs() < tolerance &&
+        (self.y - other.z).abs() < tolerance &&
+        (self.y - other.z).abs() < tolerance
+    }
 }
 
 impl Neg<Direction3D> for Direction3D {
@@ -387,6 +393,11 @@ impl Ray3D {
     
     pub fn point(&self, distance: f32) -> Point3D {
         self.origin.translate_dist(&self.direction, distance)
+    }
+    
+    pub fn eq_tol(&self, other: &Ray3D, tolerance: f32) -> bool {
+        self.origin.eq_tol(other.origin, tolerance) &&
+        self.direction.eq_tol(oher.direction, tolerance)
     }
 }
 
@@ -427,5 +438,11 @@ impl Matrix3D {
         let vec_z = unit_z.to_vector();
 
         Matrix3D::new(&vec_x, &vec_y, &vec_z)
+    }
+    
+    pub fn eq_tol(&self, other: &Point3D, tolerance: f32) -> bool {
+        self.x.eq_tol(other.x, tolerance) &&
+        self.y.eq_tol(other.y, tolerance) &&
+        self.z.eq_tol(other.z, tolerance)
     }
 }
