@@ -1,6 +1,8 @@
 extern crate time;
 
+use std::os::{num_cpus};
 use std::num::{Float, FloatMath};
+use std::sync::{Arc, Future};
 
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use color::{ColorRGB};
@@ -10,7 +12,7 @@ use sphere::{Sphere};
 use plane::{Plane};
 use scene_light::{SceneLight};
 
-use table::{Table};
+use table::{Table, AsTable};
 use camera::{Camera};
 use ppm_image::{PPMImage};
 
@@ -36,18 +38,18 @@ static EXAMPLE_TO_RUN: uint = 3;
 fn main() {
 
     let start = time::precise_time_ns();
-    let result;
 
+    let camera;
+    let mut scene;
+
+    let scene_setup_start = time::precise_time_ns();
     if EXAMPLE_TO_RUN == 1 {
         //----------------------------------------------------------------------
         // Scratchapixel Tutorial
         //----------------------------------------------------------------------
-    
-        let dimensions = (640, 480);
-        let field_of_view: f32 = 30.0;
-        
+            
         let background_color = ColorRGB::from_rgb(2.0, 2.0, 2.0);
-        let mut scene = Scene::new(&background_color, 1.0, 5);
+        scene = Scene::new(&background_color, 1.0, 5);
 
         let ground_sphere = box Sphere::new(&Point3D::from_xyz(0.0, -10004.0, 20.0), 10000.0, &MaterialBuilder::new()
             .color(&ColorRGB::from_rgb(0.20, 0.20, 0.20))
@@ -112,22 +114,16 @@ fn main() {
         let light_source = box SceneLight::new(&Point3D::from_xyz(0.0, 20.0, 30.0), 3.0, &ColorRGB::from_rgb(3.0, 3.0, 3.0));
         scene.add_light_source(light_source);
 
-        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
-        let camera = Camera::from_fov(dimensions, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        
-        render(&scene, &camera, &mut pixel_table);
-
-        let image = PPMImage::new("example1.ppm");
-        result = image.save(&pixel_table);
+        let image_dimensions = (640, 480);
+        let field_of_view: f32 = 30.0;
+        camera = Camera::from_fov(image_dimensions, field_of_view, 1.0, Point3D::origin(), &Point3D::from_xyz(0.0, 0.0, 1.0));
         
     } else if EXAMPLE_TO_RUN == 2 {
         //----------------------------------------------------------------------
         // flipcode Tutorial, version 1 & version 2
         //----------------------------------------------------------------------
 
-        let dimensions = (800, 600);
-
-        let mut scene = Scene::new(ColorRGB::black(), 1.0, 5);
+        scene = Scene::new(ColorRGB::black(), 1.0, 5);
 
         let ground_plane = box Plane::from_d_vector(4.4, &Vector3D::from_xyz(0.0, 1.0, 0.0), &MaterialBuilder::new()
             .color(&ColorRGB::from_rgb(0.4, 0.3, 0.3))
@@ -165,21 +161,15 @@ fn main() {
         let light_source2 = box SceneLight::new(&Point3D::from_xyz(2.0, 5.0, 1.0), 0.1, &ColorRGB::from_rgb(0.7, 0.7, 0.9));
         scene.add_light_source(light_source2);
 
-        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
-        let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-        
-        render(&scene, &camera, &mut pixel_table);
+        let image_dimensions = (800, 600);
+        camera = Camera::from_dimensions(image_dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
 
-        let image = PPMImage::new("example2.ppm");
-        result = image.save(&pixel_table);
     } else {
         //----------------------------------------------------------------------
         // flipcode Tutorial, version 3
         //----------------------------------------------------------------------
-    
-        let dimensions = (800, 600);
 
-        let mut scene = Scene::new(ColorRGB::black(), 1.0, 5);
+        scene = Scene::new(ColorRGB::black(), 1.0, 5);
 
         let ground_plane = box Plane::from_d_vector(4.4, &Vector3D::from_xyz(0.0, 1.0, 0.0), &MaterialBuilder::new()
             .color(&ColorRGB::from_rgb(0.4, 0.3, 0.3))
@@ -275,14 +265,24 @@ fn main() {
             }
         }
 
-        let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
-        let camera = Camera::from_dimensions(dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
-
-        render(&scene, &camera, &mut pixel_table);
-
-        let image = PPMImage::new("example3.ppm");
-        result = image.save(&pixel_table);
+        let image_dimensions = (800, 600);
+        camera = Camera::from_dimensions(image_dimensions, (8.0, 6.0), 5.0, &Point3D::from_xyz(0.0, 0.0, -5.0), &Point3D::from_xyz(0.0, 0.0, 1.0));
     }
+
+    let scene_setup_end = time::precise_time_ns();
+    let elapsed = (scene_setup_end - scene_setup_start) / 1000000;
+    println!("Scene Setup     : {}", elapsed);
+
+    let pixel_table = render(Arc::new(scene), Arc::new(camera));
+
+    let image_saving_start = time::precise_time_ns();
+
+    let image = PPMImage::new(format!("example{}.ppm", EXAMPLE_TO_RUN).as_slice());
+    let result = image.save(&pixel_table);
+
+    let image_saving_end = time::precise_time_ns();
+    let elapsed = (image_saving_end - image_saving_start) / 1000000;
+    println!("Image Saving    : {}", elapsed);
     
     match result {
         Ok(_) => println!("Image rendered successfully"),
@@ -296,24 +296,80 @@ fn main() {
     println!("Elapsed time: {}", elapsed);
 }
     
-fn render(scene: &Scene, camera: &Camera, pixel_table: &mut Table<ColorRGB>) {
-    let dimensions = pixel_table.get_dimensions();
+fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
+    let dimensions = camera.get_image_dimensions();
     let (width, height) = dimensions;
-    
+
+    let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
+
     // Initial Pixel Coloring
-    for (index, value) in pixel_table.iter_mut().enumerate_2d() {
-        let ray = camera.get_primary_ray(index);
-        let result = scene.trace(&ray, 0);
+    // let intital_coloring_start = time::precise_time_ns();
+    // for (index, value) in pixel_table.iter_mut().enumerate_2d() {
+    //     let ray = camera.get_primary_ray(index);
+    //     let result = scene.trace(&ray, 0);
         
-        let result_color = ColorRGB::from_rgb(
-            result.color.red.min(1.0),
-            result.color.green.min(1.0),
-            result.color.blue.min(1.0)
-        );
-        *value = result_color;
+    //     let result_color = ColorRGB::from_rgb(
+    //         result.color.red.min(1.0),
+    //         result.color.green.min(1.0),
+    //         result.color.blue.min(1.0)
+    //     );
+    //     *value = result_color;
+    // }
+    // let initial_coloring_end = time::precise_time_ns();
+
+    let thread_setup_start = time::precise_time_ns();
+    let num_threads = num_cpus();
+
+    let total_pixels = width * height;
+    let pixels_per_thread = if total_pixels % num_threads > 0 {
+        total_pixels / num_threads + 1
+    } else {
+        total_pixels / num_threads
+    };
+
+    // Initial Pixel Coloring
+    let initial_coloring_futures = Vec::from_fn(num_threads, |thread_index| {
+        let local_camera = camera.clone();
+        let local_scene = scene.clone();
+        Future::spawn(proc() {
+            let start_index = pixels_per_thread * thread_index;
+
+            let num_pixels = if thread_index != num_threads-1 {
+                pixels_per_thread
+            } else {
+                total_pixels - start_index
+            };
+
+            let mut local_table = Vec::with_capacity(num_pixels);
+            for (index, _) in range(0, num_pixels).as_table(dimensions).enumerate_2d_from_index(start_index) {
+                let ray = local_camera.get_primary_ray(index);
+                let result = local_scene.trace(&ray, 0);
+                
+                let result_color = ColorRGB::from_rgb(
+                    result.color.red.min(1.0),
+                    result.color.green.min(1.0),
+                    result.color.blue.min(1.0)
+                );
+                local_table.push(result_color);
+            }
+            local_table
+        })
+    });
+    let thread_setup_end = time::precise_time_ns();
+
+    // Collect the colored pixels back into the original table.
+    let thread_waiting_start = time::precise_time_ns();
+    let intital_coloring = initial_coloring_futures.into_iter().flat_map(|f| f.unwrap().into_iter()).collect::<Vec<_>>();
+    let thread_waiting_end = time::precise_time_ns();
+
+    let pixel_combining_start = time::precise_time_ns();
+    for (pixel, color) in pixel_table.iter_mut().zip(intital_coloring.iter()) {
+        *pixel = *color;
     }
+    let pixel_combining_end = time::precise_time_ns();
     
     // Edge Detection
+    let edge_detection_start = time::precise_time_ns();
     let mut is_edge = Table::from_elem(dimensions, false);
     for (index, value) in is_edge.iter_mut().enumerate_2d() {
         let (row, column) = index;
@@ -338,8 +394,10 @@ fn render(scene: &Scene, camera: &Camera, pixel_table: &mut Table<ColorRGB>) {
             }
         }
     }
+    let edge_detection_end = time::precise_time_ns();
 
     // Anti-aliasing
+    let anti_aliasing_start = time::precise_time_ns();
     let sub_width = 3;
     let sub_height = 3;
     let sub_size = (sub_width * sub_height) as f32;
@@ -361,6 +419,22 @@ fn render(scene: &Scene, camera: &Camera, pixel_table: &mut Table<ColorRGB>) {
             *value = pixel_color;
         }
     }
+    let anti_aliasing_end = time::precise_time_ns();
+
+    // let elapsed = (initial_coloring_end - intital_coloring_start) / 1000000;
+    // println!("Initial Coloring: {}", elapsed);
+    let elapsed = (thread_setup_end - thread_setup_start) / 1000000;
+    println!("Thread Setup    : {}", elapsed);
+    let elapsed = (thread_waiting_end - thread_waiting_start) / 1000000;
+    println!("Thread Waiting  : {}", elapsed);
+    let elapsed = (pixel_combining_end - pixel_combining_start) / 1000000;
+    println!("Pixel Combining : {}", elapsed);
+    let elapsed = (edge_detection_end - edge_detection_start) / 1000000;
+    println!("Edge Detection  : {}", elapsed);
+    let elapsed = (anti_aliasing_end - anti_aliasing_start) / 1000000;
+    println!("Anti-aliasing   : {}", elapsed);
+
+    pixel_table
 }
 
 fn calculate_gradient(p1: f32, p2: f32, p3: f32, p4: f32, p6: f32, p7: f32, p8: f32, p9: f32) -> f32

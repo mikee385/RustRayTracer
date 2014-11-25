@@ -9,6 +9,7 @@ use table::{Table};
 pub struct Camera {   
     position: Point3D,
     orientation: Matrix3D,
+    image_dimensions: (uint, uint),
     
     x_min: f32,
     y_max: f32,
@@ -18,39 +19,41 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn from_fov(table_dimensions: (uint, uint), field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let (table_width_uint, table_height_uint) = table_dimensions;
-        let table_width = table_width_uint as f32;
-        let table_height = table_height_uint as f32;
+    pub fn from_fov(image_dimensions: (uint, uint), field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (image_width_uint, image_height_uint) = image_dimensions;
+        let image_width = image_width_uint as f32;
+        let image_height = image_height_uint as f32;
 
         let y_max = (field_of_view / 2.0 * DEGREES_TO_RADIANS).tan() * distance_to_plane;
-        let x_min = -y_max * table_width / table_height;
+        let x_min = -y_max * image_width / image_height;
 
         Camera {
             position: *position,
             orientation: compute_orientation(position, look_at_point),
+            image_dimensions: image_dimensions,
             x_min: x_min,
             y_max: y_max,
-            dx: -2.0 * x_min / table_width,
-            dy: 2.0 * y_max / table_height,
+            dx: -2.0 * x_min / image_width,
+            dy: 2.0 * y_max / image_height,
             distance_to_plane: distance_to_plane
         }
     }
     
-    pub fn from_dimensions(table_dimensions: (uint, uint), plane_dimensions: (f32, f32), distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let (table_width_uint, table_height_uint) = table_dimensions;
-        let table_width = table_width_uint as f32;
-        let table_height = table_height_uint as f32;
+    pub fn from_dimensions(image_dimensions: (uint, uint), plane_dimensions: (f32, f32), distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (image_width_uint, image_height_uint) = image_dimensions;
+        let image_width = image_width_uint as f32;
+        let image_height = image_height_uint as f32;
 
         let (plane_width, plane_height) = plane_dimensions;
 
         Camera {
             position: *position,
             orientation: compute_orientation(position, look_at_point),
+            image_dimensions: image_dimensions,
             x_min: -plane_width / 2.0,
             y_max: plane_height / 2.0,
-            dx: plane_width / table_width,
-            dy: plane_height / table_height,
+            dx: plane_width / image_width,
+            dy: plane_height / image_height,
             distance_to_plane: distance_to_plane
         }
     }
@@ -61,6 +64,10 @@ impl Camera {
 
     pub fn get_orientation(&self) -> &Matrix3D {
         &self.orientation
+    }
+
+    pub fn get_image_dimensions(&self) -> (uint, uint) {
+        self.image_dimensions
     }
     
     pub fn get_primary_ray(&self, index: (uint, uint)) -> Ray3D {
