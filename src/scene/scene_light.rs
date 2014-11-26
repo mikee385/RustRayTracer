@@ -1,10 +1,9 @@
-#![allow(dead_code)]
-
 use geometry::{Point3D, Direction3D, Ray3D};
 use color::{ColorRGB};
 use material::{Material};
-use scene_object::{SceneObject};
-use sphere::{Sphere};
+
+use super::scene_object::{SceneObject};
+use super::sphere::{Sphere};
 
 #[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct SceneLight {

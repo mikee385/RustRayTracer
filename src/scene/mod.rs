@@ -1,10 +1,22 @@
+#![allow(dead_code)]
+
 use std::num::{Float};
 use std::vec::{Vec};
 
 use geometry::{Vector3D, Ray3D};
 use color::{ColorRGB};
-use scene_object::{SceneObject};
-use scene_light::{SceneLight};
+
+pub use self::scene_object::{SceneObject};
+pub use self::scene_light::{SceneLight};
+pub use self::plane::{Plane};
+pub use self::sphere::{Sphere};
+pub use self::camera::{Camera};
+
+mod scene_object;
+mod scene_light;
+mod plane;
+mod sphere;
+mod camera;
 
 const BIAS: f32 = 1.0e-4;
 

@@ -9,27 +9,16 @@ use color::{ColorRGB};
 use material::{MaterialBuilder};
 use table::{Table, AsTable};
 use ppm_image::{PPMImage};
-
-use scene_light::{SceneLight};
-use sphere::{Sphere};
-use plane::{Plane};
-use camera::{Camera};
-use scene::{Scene};
+use scene::{Scene, SceneLight, Sphere, Plane, Camera};
 
 mod geometry;
 mod color;
 mod material;
 mod table;
 mod ppm_image;
-
-mod scene_object;
-mod scene_light;
-mod sphere;
-mod plane;
-mod camera;
 mod scene;
 
-const EXAMPLE_TO_RUN: uint = 3;
+static EXAMPLE_TO_RUN: uint = 3;
 
 fn main() {
 
