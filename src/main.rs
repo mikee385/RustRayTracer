@@ -7,33 +7,29 @@ use std::sync::{Arc, Future};
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use color::{ColorRGB};
 use material::{MaterialBuilder};
-
-use sphere::{Sphere};
-use plane::{Plane};
-use scene_light::{SceneLight};
-
 use table::{Table, AsTable};
-use camera::{Camera};
 use ppm_image::{PPMImage};
 
+use scene_light::{SceneLight};
+use sphere::{Sphere};
+use plane::{Plane};
+use camera::{Camera};
 use scene::{Scene};
 
 mod geometry;
 mod color;
 mod material;
-
-mod scene_object;
-mod sphere;
-mod plane;
-mod scene_light;
-
 mod table;
-mod camera;
 mod ppm_image;
 
+mod scene_object;
+mod scene_light;
+mod sphere;
+mod plane;
+mod camera;
 mod scene;
 
-static EXAMPLE_TO_RUN: uint = 3;
+const EXAMPLE_TO_RUN: uint = 3;
 
 fn main() {
 
