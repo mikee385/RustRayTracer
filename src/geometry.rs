@@ -365,9 +365,7 @@ impl Direction3D {
     }
     
     pub fn eq_tol(&self, other: &Direction3D, tolerance: f32) -> bool {
-        (self.x - other.x).abs() < tolerance &&
-        (self.y - other.z).abs() < tolerance &&
-        (self.y - other.z).abs() < tolerance
+        self.direction.eq_tol(&other.direction, tolerance)
     }
 }
 
@@ -396,8 +394,8 @@ impl Ray3D {
     }
     
     pub fn eq_tol(&self, other: &Ray3D, tolerance: f32) -> bool {
-        self.origin.eq_tol(other.origin, tolerance) &&
-        self.direction.eq_tol(oher.direction, tolerance)
+        self.origin.eq_tol(&other.origin, tolerance) &&
+        self.direction.eq_tol(&other.direction, tolerance)
     }
 }
 
@@ -440,9 +438,9 @@ impl Matrix3D {
         Matrix3D::new(&vec_x, &vec_y, &vec_z)
     }
     
-    pub fn eq_tol(&self, other: &Point3D, tolerance: f32) -> bool {
-        self.x.eq_tol(other.x, tolerance) &&
-        self.y.eq_tol(other.y, tolerance) &&
-        self.z.eq_tol(other.z, tolerance)
+    pub fn eq_tol(&self, other: &Matrix3D, tolerance: f32) -> bool {
+        self.x.eq_tol(&other.x, tolerance) &&
+        self.y.eq_tol(&other.y, tolerance) &&
+        self.z.eq_tol(&other.z, tolerance)
     }
 }

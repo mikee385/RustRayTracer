@@ -359,7 +359,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
 
     // Collect the colored pixels back into the original table.
     let thread_waiting_start = time::precise_time_ns();
-    let intital_coloring = initial_coloring_futures.into_iter().flat_map(|f| f.unwrap().into_iter()).collect::<Vec<_>>();
+    let intital_coloring = initial_coloring_futures.into_iter().flat_map(|f| f.into_inner().into_iter()).collect::<Vec<_>>();
     let thread_waiting_end = time::precise_time_ns();
 
     let pixel_combining_start = time::precise_time_ns();
