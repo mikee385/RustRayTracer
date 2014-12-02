@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::slice::{Items, MutItems};
-use std::vec::{Vec};
+use std::vec::{Vec, MoveItems};
 
 pub struct Table<T> {
     dimensions: (uint, uint),
@@ -38,18 +38,6 @@ impl<T> Table<T> {
     pub fn get_dimensions(&self) -> (uint, uint) {
         self.dimensions
     }
-    
-    #[inline]
-    pub fn set(&mut self, index: (uint, uint), value: T) {
-        let vec_index = self.get_vec_index(index);
-        self.data[vec_index] = value;
-    }
-    
-    #[inline]
-    pub fn get(&self, index: (uint, uint)) -> &T {
-        let vec_index = self.get_vec_index(index);
-        &self.data[vec_index]
-    }
 
     #[inline]
     pub fn iter<'a>(&'a self) -> TableItems<Items<'a, T>> {
@@ -62,13 +50,24 @@ impl<T> Table<T> {
     }
 
     #[inline]
-    pub fn as_slice<'a>(&'a self) -> &'a [T] {
-        self.data.as_slice()
+    pub fn into_iter<'a>(self) -> TableItems<MoveItems<T>> {
+        self.data.into_iter().as_table(self.dimensions)
     }
+}
 
+impl<T> Index<(uint, uint), T> for Table<T> {
     #[inline]
-    pub fn as_mut_slice<'a>(&'a mut self) -> &'a mut [T] {
-        self.data.as_mut_slice()
+    fn index<'a>(&'a self, index: &(uint, uint)) -> &'a T {
+        let vec_index = self.get_vec_index(*index);
+        self.data.index(&vec_index)
+    }
+}
+
+impl<T> IndexMut<(uint, uint), T> for Table<T> {
+    #[inline]
+    fn index_mut<'a>(&'a mut self, index: &(uint, uint)) -> &'a mut T {
+        let vec_index = self.get_vec_index(*index);
+        self.data.index_mut(&vec_index)
     }
 }
 

@@ -359,14 +359,14 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     for (index, value) in is_edge.iter_mut().enumerate_2d() {
         let (row, column) = index;
         if row != 0 && column != 0 && row != height-1 && column != width-1 {
-            let p1 = pixel_table.get((row - 1, column - 1));
-            let p2 = pixel_table.get((row - 1, column));
-            let p3 = pixel_table.get((row - 1, column + 1));
-            let p4 = pixel_table.get((row, column - 1));
-            let p6 = pixel_table.get((row, column + 1));
-            let p7 = pixel_table.get((row + 1, column - 1));
-            let p8 = pixel_table.get((row + 1, column));
-            let p9 = pixel_table.get((row + 1, column + 1));
+            let p1 = pixel_table[(row - 1, column - 1)];
+            let p2 = pixel_table[(row - 1, column)];
+            let p3 = pixel_table[(row - 1, column + 1)];
+            let p4 = pixel_table[(row, column - 1)];
+            let p6 = pixel_table[(row, column + 1)];
+            let p7 = pixel_table[(row + 1, column - 1)];
+            let p8 = pixel_table[(row + 1, column)];
+            let p9 = pixel_table[(row + 1, column + 1)];
 
             let r = calculate_gradient(p1.red, p2.red, p3.red, p4.red, p6.red, p7.red, p8.red, p9.red);
             let g = calculate_gradient(p1.green, p2.green, p3.green, p4.green, p6.green, p7.green, p8.green, p9.green);
@@ -388,7 +388,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let sub_size = (sub_width * sub_height) as f32;
     let mut sub_rays = Table::from_elem((sub_width, sub_height), Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
     for (index, value) in pixel_table.iter_mut().enumerate_2d() {
-        if *is_edge.get(index) {
+        if is_edge[index] {
             let mut pixel_color = *ColorRGB::black();
             
             camera.get_sub_rays(index, &mut sub_rays);

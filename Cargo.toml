@@ -2,7 +2,11 @@
 
 name = "RustRayTracer"
 version = "0.0.1"
-authors = ["Michael Pierce"]
+authors = ["Michael Pierce <michaelspierce@gmail.com>"]
+
+[[bin]]
+name = "RustRayTracer"
+path = "src/main.rs"
 
 [dependencies]
 time = "*"
