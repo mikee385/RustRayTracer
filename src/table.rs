@@ -9,6 +9,7 @@ pub struct Table<T> {
 }
 
 impl<T: Clone> Table<T> {
+    #[inline]
     pub fn from_elem(dimensions: (uint, uint), value: T) -> Table<T> {
         let (width, height) = dimensions;
 
@@ -35,6 +36,7 @@ impl<T> Table<T> {
         row * width + column
     }
 
+    #[inline]
     pub fn get_dimensions(&self) -> (uint, uint) {
         self.dimensions
     }
@@ -84,6 +86,7 @@ impl<A, T: Iterator<A>> Iterator<A> for TableItems<T> {
 }
 
 pub trait AsTable<'a, T> {
+    #[inline]
     fn as_table(self, dimensions: (uint, uint)) -> TableItems<Self> {
         TableItems {
             iter: self,
@@ -127,6 +130,7 @@ impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableItem
 }
 
 impl<T> TableItems<T> {
+    #[inline]
     pub fn enumerate_2d(self) -> TableEnumerate<TableItems<T>> {
         TableEnumerate {
             iter: self,
@@ -135,6 +139,7 @@ impl<T> TableItems<T> {
         }
     }
 
+    #[inline]
     pub fn enumerate_2d_from(self, start: (uint, uint)) -> TableEnumerate<TableItems<T>> {
         let (row_start, column_start) = start;
 
@@ -145,6 +150,7 @@ impl<T> TableItems<T> {
         }
     }
 
+    #[inline]
     pub fn enumerate_2d_from_index(self, index: uint) -> TableEnumerate<TableItems<T>> {
         let (width, _) = self.dimensions;
         let row_start = index / width;
