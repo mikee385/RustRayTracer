@@ -4,19 +4,19 @@ use std::os::{num_cpus};
 use std::num::{Float, FloatMath};
 use std::sync::{Arc, Future};
 
-use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
 use color::{ColorRGB};
+use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
+use image::{PPMImage};
 use material::{MaterialBuilder};
-use table::{Table, AsTable};
-use ppm_image::{PPMImage};
 use scene::{Scene, SceneLight, Sphere, Plane, Camera};
+use table::{Table, AsTable};
 
-mod geometry;
 mod color;
+mod geometry;
+mod image;
 mod material;
-mod table;
-mod ppm_image;
 mod scene;
+mod table;
 
 static EXAMPLE_TO_RUN: uint = 3;
 
