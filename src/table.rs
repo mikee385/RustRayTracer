@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::slice::{Items, MutItems};
 use std::vec::{Vec, MoveItems};
 

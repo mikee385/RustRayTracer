@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::f32::consts::{PI};
 
 pub use self::point::{Point3D};

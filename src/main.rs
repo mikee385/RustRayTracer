@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![feature(if_let)]
+
 extern crate time;
 
 use std::os::{num_cpus};

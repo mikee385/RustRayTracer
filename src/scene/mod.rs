@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::num::{Float};
 use std::vec::{Vec};
 
@@ -68,8 +66,7 @@ impl Scene {
         let mut optional_nearest: Option<(&InternalObject, f32)> = None;
         for current_item in self.items.iter() {
             let optional_intersection = current_item.object.intersect(ray);
-            if optional_intersection.is_some() {
-                let current_distance = optional_intersection.unwrap();
+            if let Some(current_distance) = optional_intersection {
                 match optional_nearest {
                     Some((_, nearest_distance)) => {
                         if current_distance < nearest_distance {
@@ -172,8 +169,7 @@ impl Scene {
             for shadow_item in self.items.iter() {
                 if shadow_item.index != light_item.index {
                     let shadow_result = shadow_item.object.intersect(&shadow_ray);
-                    if shadow_result.is_some() {
-                        let distance = shadow_result.unwrap();
+                    if let Some(distance) = shadow_result {
                         if distance < distance_to_light {
                             shade = 0.0;
                             break;

@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 #[deriving(PartialEq, PartialOrd, Clone, Show)]
 pub struct ColorRGB {
     pub red: f32,
