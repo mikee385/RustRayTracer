@@ -1,6 +1,6 @@
 use super::{Point3D, Direction3D};
 
-#[deriving(PartialEq, PartialOrd, Clone, Show)]
+#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Ray3D {
     pub origin: Point3D,
     pub direction: Direction3D

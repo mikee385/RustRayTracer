@@ -1,4 +1,4 @@
-#[deriving(PartialEq, PartialOrd, Clone, Show)]
+#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct ColorRGB {
     pub red: f32,
     pub green: f32,

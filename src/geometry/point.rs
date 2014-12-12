@@ -2,7 +2,7 @@ use std::num::{Float};
 
 use super::{Vector3D, Direction3D, Matrix3D};
 
-#[deriving(PartialEq, PartialOrd, Clone, Show)]
+#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Point3D {
     pub x: f32,
     pub y: f32,
