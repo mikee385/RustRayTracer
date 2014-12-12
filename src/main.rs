@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![feature(if_let)]
 
 extern crate time;
 
