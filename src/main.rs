@@ -318,7 +318,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let initial_coloring_futures = Vec::from_fn(num_threads, |thread_index| {
         let local_camera = camera.clone();
         let local_scene = scene.clone();
-        Future::spawn(proc() {
+        Future::spawn(move|| {
             let start_index = pixels_per_thread * thread_index;
 
             let num_pixels = if thread_index != num_threads-1 {
