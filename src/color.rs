@@ -41,8 +41,8 @@ impl ColorRGB {
     }
 }
 
-impl Add<ColorRGB, ColorRGB> for ColorRGB {
-    fn add(&self, other: &ColorRGB) -> ColorRGB {
+impl<'a, 'b> Add<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
+    fn add(self, other: &ColorRGB) -> ColorRGB {
         ColorRGB::from_rgb(
             self.red + other.red,
             self.green + other.green,
@@ -51,32 +51,64 @@ impl Add<ColorRGB, ColorRGB> for ColorRGB {
     }
 }
 
-trait MulColorRGB {
-    fn mul(&self, lhs: &ColorRGB) -> ColorRGB;
-}
-
-impl<T: MulColorRGB> Mul<T, ColorRGB> for ColorRGB {
-    fn mul(&self, other: &T) -> ColorRGB {
-        other.mul(self)
+impl<'a> Add<&'a ColorRGB, ColorRGB> for ColorRGB {
+    fn add(self, other: &ColorRGB) -> ColorRGB {
+        &self + other
     }
 }
 
-impl MulColorRGB for f32 {
-    fn mul(&self, lhs: &ColorRGB) -> ColorRGB {
+impl<'a> Add<ColorRGB, ColorRGB> for &'a ColorRGB {
+    fn add(self, other: ColorRGB) -> ColorRGB {
+        self + &other
+    }
+}
+
+impl Add<ColorRGB, ColorRGB> for ColorRGB {
+    fn add(self, other: ColorRGB) -> ColorRGB {
+        &self + &other
+    }
+}
+
+impl<'a> Mul<f32, ColorRGB> for &'a ColorRGB {
+    fn mul(self, scale: f32) -> ColorRGB {
         ColorRGB::from_rgb(
-            lhs.red * *self,
-            lhs.green * *self,
-            lhs.blue * *self
+            self.red * scale,
+            self.green * scale,
+            self.blue * scale
+       )
+    }
+}
+
+impl Mul<f32, ColorRGB> for ColorRGB {
+    fn mul(self, scale: f32) -> ColorRGB {
+        &self * scale
+    }
+}
+
+impl<'a, 'b> Mul<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
+    fn mul(self, other: &ColorRGB) -> ColorRGB {
+        ColorRGB::from_rgb(
+            self.red * other.red,
+            self.green * other.green,
+            self.blue * other.blue
        )  
     }
 }
 
-impl MulColorRGB for ColorRGB {
-    fn mul(&self, lhs: &ColorRGB) -> ColorRGB {
-        ColorRGB::from_rgb(
-            lhs.red * self.red,
-            lhs.green * self.green,
-            lhs.blue * self.blue
-       )  
+impl<'a> Mul<&'a ColorRGB, ColorRGB> for ColorRGB {
+    fn mul(self, other: &ColorRGB) -> ColorRGB {
+        &self * other
+    }
+}
+
+impl<'a> Mul<ColorRGB, ColorRGB> for &'a ColorRGB {
+    fn mul(self, other: ColorRGB) -> ColorRGB {
+        self * &other
+    }
+}
+
+impl Mul<ColorRGB, ColorRGB> for ColorRGB {
+    fn mul(self, other: ColorRGB) -> ColorRGB {
+        &self * &other
     }
 }

@@ -65,13 +65,13 @@ impl Vector3D {
     }
     
     pub fn projection_dir(&self, direction: &Direction3D) -> Vector3D {
-        direction.to_vector() * Vector3D::dot(self, direction.as_vector())
+        direction.as_vector() * Vector3D::dot(self, direction.as_vector())
     }
     
     pub fn projection_vec(&self, direction: &Vector3D) -> Vector3D {
         let denominator = Vector3D::dot(direction, direction);
         if denominator > 0.0 {
-            *direction * (Vector3D::dot(self, direction) / denominator)
+            direction * (Vector3D::dot(self, direction) / denominator)
         } else {
             *Vector3D::zero()
         }
@@ -109,8 +109,8 @@ impl Vector3D {
     }
 }
 
-impl Add<Vector3D, Vector3D> for Vector3D {
-    fn add(&self, other: &Vector3D) -> Vector3D {
+impl<'a, 'b> Add<&'a Vector3D, Vector3D> for &'b Vector3D {
+    fn add(self, other: &Vector3D) -> Vector3D {
         Vector3D::from_xyz(
             self.x + other.x,
             self.y + other.y,
@@ -119,8 +119,26 @@ impl Add<Vector3D, Vector3D> for Vector3D {
     }
 }
 
-impl Sub<Vector3D, Vector3D> for Vector3D {
-    fn sub(&self, other: &Vector3D) -> Vector3D {
+impl<'a> Add<&'a Vector3D, Vector3D> for Vector3D {
+    fn add(self, other: &Vector3D) -> Vector3D {
+        &self + other
+    }
+}
+
+impl<'a> Add<Vector3D, Vector3D> for &'a Vector3D {
+    fn add(self, other: Vector3D) -> Vector3D {
+        self + &other
+    }
+}
+
+impl Add<Vector3D, Vector3D> for Vector3D {
+    fn add(self, other: Vector3D) -> Vector3D {
+        &self + &other
+    }
+}
+
+impl<'a, 'b> Sub<&'a Vector3D, Vector3D> for &'b Vector3D {
+    fn sub(self, other: &Vector3D) -> Vector3D {
         Vector3D::from_xyz(
             self.x - other.x,
             self.y - other.y,
@@ -129,16 +147,46 @@ impl Sub<Vector3D, Vector3D> for Vector3D {
     }
 }
 
+impl<'a> Sub<&'a Vector3D, Vector3D> for Vector3D {
+    fn sub(self, other: &Vector3D) -> Vector3D {
+        &self - other
+    }
+}
+
+impl<'a> Sub<Vector3D, Vector3D> for &'a Vector3D {
+    fn sub(self, other: Vector3D) -> Vector3D {
+        self - &other
+    }
+}
+
+impl Sub<Vector3D, Vector3D> for Vector3D {
+    fn sub(self, other: Vector3D) -> Vector3D {
+        &self - &other
+    }
+}
+
+impl<'a> Mul<f32, Vector3D> for &'a Vector3D {
+    fn mul(self, scale: f32) -> Vector3D {
+        self.scale(scale)        
+    }
+}
+
 impl Mul<f32, Vector3D> for Vector3D {
-    fn mul(&self, scale: &f32) -> Vector3D {
-        self.scale(*scale)        
+    fn mul(self, scale: f32) -> Vector3D {
+        &self * scale
+    }
+}
+
+impl<'a> Div<f32, Vector3D> for &'a Vector3D {
+    fn div(self, scale: f32) -> Vector3D {
+        let inv_scale = 1.0 / scale;
+        self.scale(inv_scale)        
     }
 }
 
 impl Div<f32, Vector3D> for Vector3D {
-    fn div(&self, scale: &f32) -> Vector3D {
-        let inv_scale = 1.0 / *scale;
-        self.scale(inv_scale)        
+    fn div(self, scale: f32) -> Vector3D {
+        &self / scale       
     }
 }
 

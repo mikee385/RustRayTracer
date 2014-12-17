@@ -59,14 +59,6 @@ impl Direction3D {
         &self.direction
     }
     
-    pub fn to_vector(&self) -> Vector3D {
-        Vector3D {
-            x: self.direction.x,
-            y: self.direction.y,
-            z: self.direction.z
-        }
-    }
-    
     pub fn x(&self) -> f32 {
         self.direction.x
     }
