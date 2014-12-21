@@ -190,12 +190,18 @@ impl Div<f32, Vector3D> for Vector3D {
     }
 }
 
-impl Neg<Vector3D> for Vector3D {
-    fn neg(&self) -> Vector3D {
+impl<'a> Neg<Vector3D> for &'a Vector3D {
+    fn neg(self) -> Vector3D {
         Vector3D::from_xyz(
             -self.x,
             -self.y,
             -self.z
         )
+    }
+}
+
+impl Neg<Vector3D> for Vector3D {
+    fn neg(self) -> Vector3D {
+        -&self
     }
 }

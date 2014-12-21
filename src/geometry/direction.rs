@@ -122,8 +122,14 @@ impl Direction3D {
     }
 }
 
-impl Neg<Direction3D> for Direction3D {
-    fn neg(&self) -> Direction3D {
+impl<'a> Neg<Direction3D> for &'a Direction3D {
+    fn neg(self) -> Direction3D {
         Direction3D::from_normalized_vector(&self.as_vector().neg())
+    }
+}
+
+impl Neg<Direction3D> for Direction3D {
+    fn neg(self) -> Direction3D {
+        -&self
     }
 }
