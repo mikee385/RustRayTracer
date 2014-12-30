@@ -1,5 +1,5 @@
-use std::slice::{Items, MutItems};
-use std::vec::{Vec, MoveItems};
+use std::slice::{Iter, IterMut};
+use std::vec::{Vec, IntoIter};
 
 pub struct Table<T> {
     dimensions: (uint, uint),
@@ -40,17 +40,17 @@ impl<T> Table<T> {
     }
 
     #[inline]
-    pub fn iter<'a>(&'a self) -> TableItems<Items<'a, T>> {
+    pub fn iter<'a>(&'a self) -> TableIter<Iter<'a, T>> {
         self.data.iter().as_table(self.dimensions)
     }
 
     #[inline]
-    pub fn iter_mut<'a>(&'a mut self) -> TableItems<MutItems<'a, T>> {
+    pub fn iter_mut<'a>(&'a mut self) -> TableIter<IterMut<'a, T>> {
         self.data.iter_mut().as_table(self.dimensions)
     }
 
     #[inline]
-    pub fn into_iter<'a>(self) -> TableItems<MoveItems<T>> {
+    pub fn into_iter<'a>(self) -> TableIter<IntoIter<T>> {
         self.data.into_iter().as_table(self.dimensions)
     }
 }
@@ -71,12 +71,12 @@ impl<T> IndexMut<(uint, uint), T> for Table<T> {
     }
 }
 
-pub struct TableItems<T> {
+pub struct TableIter<T> {
     iter: T,
     dimensions: (uint, uint)
 }
 
-impl<A, T: Iterator<A>> Iterator<A> for TableItems<T> {
+impl<A, T: Iterator<A>> Iterator<A> for TableIter<T> {
     #[inline]
     fn next(&mut self) -> Option<A> {
         self.iter.next()
@@ -85,8 +85,8 @@ impl<A, T: Iterator<A>> Iterator<A> for TableItems<T> {
 
 pub trait AsTable<'a, T> {
     #[inline]
-    fn as_table(self, dimensions: (uint, uint)) -> TableItems<Self> {
-        TableItems {
+    fn as_table(self, dimensions: (uint, uint)) -> TableIter<Self> {
+        TableIter {
             iter: self,
             dimensions: dimensions
         }
@@ -101,7 +101,7 @@ pub struct TableEnumerate<T> {
     column_count: uint
 }
 
-impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableItems<T>> {
+impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableIter<T>> {
     #[inline]
     fn next(&mut self) -> Option<((uint, uint), A)> {
         let (width, _) = self.iter.dimensions;
@@ -127,9 +127,9 @@ impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableItem
     }
 }
 
-impl<T> TableItems<T> {
+impl<T> TableIter<T> {
     #[inline]
-    pub fn enumerate_2d(self) -> TableEnumerate<TableItems<T>> {
+    pub fn enumerate_2d(self) -> TableEnumerate<TableIter<T>> {
         TableEnumerate {
             iter: self,
             row_count: 0,
@@ -138,7 +138,7 @@ impl<T> TableItems<T> {
     }
 
     #[inline]
-    pub fn enumerate_2d_from(self, start: (uint, uint)) -> TableEnumerate<TableItems<T>> {
+    pub fn enumerate_2d_from(self, start: (uint, uint)) -> TableEnumerate<TableIter<T>> {
         let (row_start, column_start) = start;
 
         TableEnumerate {
@@ -149,7 +149,7 @@ impl<T> TableItems<T> {
     }
 
     #[inline]
-    pub fn enumerate_2d_from_index(self, index: uint) -> TableEnumerate<TableItems<T>> {
+    pub fn enumerate_2d_from_index(self, index: uint) -> TableEnumerate<TableIter<T>> {
         let (width, _) = self.dimensions;
         let row_start = index / width;
         let column_start = index % width;
