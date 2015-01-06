@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+#![feature(associated_types)]
+#![feature(default_type_params)]
 
 extern crate time;
 
@@ -315,7 +317,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     };
 
     // Initial Pixel Coloring
-    let initial_coloring_futures = Vec::from_fn(num_threads, |thread_index| {
+    let initial_coloring_futures = range(0, num_threads).map(|thread_index| {
         let local_camera = camera.clone();
         let local_scene = scene.clone();
         Future::spawn(move|| {
@@ -341,7 +343,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
             }
             local_table
         })
-    });
+    }).collect::<Vec<_>>();
     let thread_setup_end = time::precise_time_ns();
 
     // Collect the colored pixels back into the original table.

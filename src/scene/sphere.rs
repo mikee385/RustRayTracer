@@ -5,7 +5,7 @@ use material::{Material};
 
 use super::scene_object::{SceneObject};
 
-#[deriving(PartialEq, PartialOrd, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Show)]
 pub struct Sphere {
     center: Point3D,
     radius: f32,

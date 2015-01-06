@@ -1,3 +1,5 @@
+use std::iter::{repeat};
+use std::ops::{Index, IndexMut};
 use std::slice::{Iter, IterMut};
 use std::vec::{Vec, IntoIter};
 
@@ -13,7 +15,7 @@ impl<T: Clone> Table<T> {
 
         Table {
             dimensions: dimensions,
-            data: Vec::from_elem(width * height, value)
+            data: repeat(value).take(width * height).collect()
         }
     }
 }
@@ -55,7 +57,9 @@ impl<T> Table<T> {
     }
 }
 
-impl<T> Index<(uint, uint), T> for Table<T> {
+impl<T> Index<(uint, uint)> for Table<T> {
+    type Output = T;
+
     #[inline]
     fn index<'a>(&'a self, index: &(uint, uint)) -> &'a T {
         let vec_index = self.get_vec_index(*index);
@@ -63,7 +67,9 @@ impl<T> Index<(uint, uint), T> for Table<T> {
     }
 }
 
-impl<T> IndexMut<(uint, uint), T> for Table<T> {
+impl<T> IndexMut<(uint, uint)> for Table<T> {
+    type Output = T;
+
     #[inline]
     fn index_mut<'a>(&'a mut self, index: &(uint, uint)) -> &'a mut T {
         let vec_index = self.get_vec_index(*index);
@@ -71,19 +77,25 @@ impl<T> IndexMut<(uint, uint), T> for Table<T> {
     }
 }
 
-pub struct TableIter<T> {
+pub struct TableIter<T: Iterator> {
     iter: T,
     dimensions: (uint, uint)
 }
 
-impl<A, T: Iterator<A>> Iterator<A> for TableIter<T> {
+impl<T: Iterator> Iterator for TableIter<T> {
+    type Item = T::Item;
+
     #[inline]
-    fn next(&mut self) -> Option<A> {
+    fn next(&mut self) -> Option<<Self as Iterator>::Item> {
         self.iter.next()
     }
 }
 
-pub trait AsTable<'a, T> {
+pub trait AsTable<'a, T: Iterator> {
+    fn as_table(self, dimensions: (uint, uint)) -> TableIter<Self>;
+}
+
+impl<'a, T: Iterator> AsTable<'a, T> for T {
     #[inline]
     fn as_table(self, dimensions: (uint, uint)) -> TableIter<Self> {
         TableIter {
@@ -93,17 +105,17 @@ pub trait AsTable<'a, T> {
     }
 }
 
-impl<'a, A, T: Iterator<A>> AsTable<'a, T> for T {}
-
 pub struct TableEnumerate<T> {
     iter: T,
     row_count: uint,
     column_count: uint
 }
 
-impl<A, T: Iterator<A>> Iterator<((uint, uint), A)> for TableEnumerate<TableIter<T>> {
+impl<T: Iterator> Iterator for TableEnumerate<TableIter<T>> {
+    type Item = ((uint, uint), T::Item);
+
     #[inline]
-    fn next(&mut self) -> Option<((uint, uint), A)> {
+    fn next(&mut self) -> Option<<Self as Iterator>::Item> {
         let (width, _) = self.iter.dimensions;
 
         match self.iter.next() {

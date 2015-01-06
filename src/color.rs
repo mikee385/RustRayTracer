@@ -1,4 +1,6 @@
-#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
+use std::ops::{Add, Mul};
+
+#[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct ColorRGB {
     pub red: f32,
     pub green: f32,
@@ -41,7 +43,9 @@ impl ColorRGB {
     }
 }
 
-impl<'a, 'b> Add<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
+impl<'a, 'b> Add<&'a ColorRGB> for &'b ColorRGB {
+    type Output = ColorRGB;
+
     fn add(self, other: &ColorRGB) -> ColorRGB {
         ColorRGB::from_rgb(
             self.red + other.red,
@@ -51,25 +55,33 @@ impl<'a, 'b> Add<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
     }
 }
 
-impl<'a> Add<&'a ColorRGB, ColorRGB> for ColorRGB {
+impl<'a> Add<&'a ColorRGB> for ColorRGB {
+    type Output = ColorRGB;
+    
     fn add(self, other: &ColorRGB) -> ColorRGB {
         &self + other
     }
 }
 
-impl<'a> Add<ColorRGB, ColorRGB> for &'a ColorRGB {
+impl<'a> Add<ColorRGB> for &'a ColorRGB {
+    type Output = ColorRGB;
+    
     fn add(self, other: ColorRGB) -> ColorRGB {
         self + &other
     }
 }
 
-impl Add<ColorRGB, ColorRGB> for ColorRGB {
+impl Add<ColorRGB> for ColorRGB {
+    type Output = ColorRGB;
+    
     fn add(self, other: ColorRGB) -> ColorRGB {
         &self + &other
     }
 }
 
-impl<'a> Mul<f32, ColorRGB> for &'a ColorRGB {
+impl<'a> Mul<f32> for &'a ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, scale: f32) -> ColorRGB {
         ColorRGB::from_rgb(
             self.red * scale,
@@ -79,13 +91,17 @@ impl<'a> Mul<f32, ColorRGB> for &'a ColorRGB {
     }
 }
 
-impl Mul<f32, ColorRGB> for ColorRGB {
+impl Mul<f32> for ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, scale: f32) -> ColorRGB {
         &self * scale
     }
 }
 
-impl<'a, 'b> Mul<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
+impl<'a, 'b> Mul<&'a ColorRGB> for &'b ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, other: &ColorRGB) -> ColorRGB {
         ColorRGB::from_rgb(
             self.red * other.red,
@@ -95,19 +111,25 @@ impl<'a, 'b> Mul<&'a ColorRGB, ColorRGB> for &'b ColorRGB {
     }
 }
 
-impl<'a> Mul<&'a ColorRGB, ColorRGB> for ColorRGB {
+impl<'a> Mul<&'a ColorRGB> for ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, other: &ColorRGB) -> ColorRGB {
         &self * other
     }
 }
 
-impl<'a> Mul<ColorRGB, ColorRGB> for &'a ColorRGB {
+impl<'a> Mul<ColorRGB> for &'a ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, other: ColorRGB) -> ColorRGB {
         self * &other
     }
 }
 
-impl Mul<ColorRGB, ColorRGB> for ColorRGB {
+impl Mul<ColorRGB> for ColorRGB {
+    type Output = ColorRGB;
+    
     fn mul(self, other: ColorRGB) -> ColorRGB {
         &self * &other
     }

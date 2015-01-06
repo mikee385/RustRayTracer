@@ -1,8 +1,9 @@
 use std::num::{Float};
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 use super::{Point3D, Direction3D, Matrix3D};
 
-#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Vector3D {
     pub x: f32,
     pub y: f32,
@@ -109,7 +110,9 @@ impl Vector3D {
     }
 }
 
-impl<'a, 'b> Add<&'a Vector3D, Vector3D> for &'b Vector3D {
+impl<'a, 'b> Add<&'a Vector3D> for &'b Vector3D {
+    type Output = Vector3D;
+    
     fn add(self, other: &Vector3D) -> Vector3D {
         Vector3D::from_xyz(
             self.x + other.x,
@@ -119,25 +122,33 @@ impl<'a, 'b> Add<&'a Vector3D, Vector3D> for &'b Vector3D {
     }
 }
 
-impl<'a> Add<&'a Vector3D, Vector3D> for Vector3D {
+impl<'a> Add<&'a Vector3D> for Vector3D {
+    type Output = Vector3D;
+    
     fn add(self, other: &Vector3D) -> Vector3D {
         &self + other
     }
 }
 
-impl<'a> Add<Vector3D, Vector3D> for &'a Vector3D {
+impl<'a> Add<Vector3D> for &'a Vector3D {
+    type Output = Vector3D;
+    
     fn add(self, other: Vector3D) -> Vector3D {
         self + &other
     }
 }
 
-impl Add<Vector3D, Vector3D> for Vector3D {
+impl Add<Vector3D> for Vector3D {
+    type Output = Vector3D;
+    
     fn add(self, other: Vector3D) -> Vector3D {
         &self + &other
     }
 }
 
-impl<'a, 'b> Sub<&'a Vector3D, Vector3D> for &'b Vector3D {
+impl<'a, 'b> Sub<&'a Vector3D> for &'b Vector3D {
+    type Output = Vector3D;
+    
     fn sub(self, other: &Vector3D) -> Vector3D {
         Vector3D::from_xyz(
             self.x - other.x,
@@ -147,50 +158,66 @@ impl<'a, 'b> Sub<&'a Vector3D, Vector3D> for &'b Vector3D {
     }
 }
 
-impl<'a> Sub<&'a Vector3D, Vector3D> for Vector3D {
+impl<'a> Sub<&'a Vector3D> for Vector3D {
+    type Output = Vector3D;
+    
     fn sub(self, other: &Vector3D) -> Vector3D {
         &self - other
     }
 }
 
-impl<'a> Sub<Vector3D, Vector3D> for &'a Vector3D {
+impl<'a> Sub<Vector3D> for &'a Vector3D {
+    type Output = Vector3D;
+    
     fn sub(self, other: Vector3D) -> Vector3D {
         self - &other
     }
 }
 
-impl Sub<Vector3D, Vector3D> for Vector3D {
+impl Sub<Vector3D> for Vector3D {
+    type Output = Vector3D;
+    
     fn sub(self, other: Vector3D) -> Vector3D {
         &self - &other
     }
 }
 
-impl<'a> Mul<f32, Vector3D> for &'a Vector3D {
+impl<'a> Mul<f32> for &'a Vector3D {
+    type Output = Vector3D;
+    
     fn mul(self, scale: f32) -> Vector3D {
         self.scale(scale)        
     }
 }
 
-impl Mul<f32, Vector3D> for Vector3D {
+impl Mul<f32> for Vector3D {
+    type Output = Vector3D;
+    
     fn mul(self, scale: f32) -> Vector3D {
         &self * scale
     }
 }
 
-impl<'a> Div<f32, Vector3D> for &'a Vector3D {
+impl<'a> Div<f32> for &'a Vector3D {
+    type Output = Vector3D;
+    
     fn div(self, scale: f32) -> Vector3D {
         let inv_scale = 1.0 / scale;
         self.scale(inv_scale)        
     }
 }
 
-impl Div<f32, Vector3D> for Vector3D {
+impl Div<f32> for Vector3D {
+    type Output = Vector3D;
+    
     fn div(self, scale: f32) -> Vector3D {
         &self / scale       
     }
 }
 
-impl<'a> Neg<Vector3D> for &'a Vector3D {
+impl<'a> Neg for &'a Vector3D {
+    type Output = Vector3D;
+    
     fn neg(self) -> Vector3D {
         Vector3D::from_xyz(
             -self.x,
@@ -200,7 +227,9 @@ impl<'a> Neg<Vector3D> for &'a Vector3D {
     }
 }
 
-impl Neg<Vector3D> for Vector3D {
+impl Neg for Vector3D {
+    type Output = Vector3D;
+    
     fn neg(self) -> Vector3D {
         -&self
     }

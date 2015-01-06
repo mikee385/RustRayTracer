@@ -1,8 +1,9 @@
 use std::num::{Float};
+use std::ops::{Neg};
 
 use super::{Point3D, Vector3D, Matrix3D};
 
-#[deriving(PartialEq, PartialOrd, Copy, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Direction3D {
     direction: Vector3D
 }
@@ -122,13 +123,17 @@ impl Direction3D {
     }
 }
 
-impl<'a> Neg<Direction3D> for &'a Direction3D {
+impl<'a> Neg for &'a Direction3D {
+    type Output = Direction3D;
+    
     fn neg(self) -> Direction3D {
         Direction3D::from_normalized_vector(&self.as_vector().neg())
     }
 }
 
-impl Neg<Direction3D> for Direction3D {
+impl Neg for Direction3D {
+    type Output = Direction3D;
+    
     fn neg(self) -> Direction3D {
         -&self
     }

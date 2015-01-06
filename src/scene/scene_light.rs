@@ -5,7 +5,7 @@ use material::{Material};
 use super::scene_object::{SceneObject};
 use super::sphere::{Sphere};
 
-#[deriving(PartialEq, PartialOrd, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Show)]
 pub struct SceneLight {
     sphere: Sphere
 }
