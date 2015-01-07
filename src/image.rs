@@ -1,5 +1,5 @@
 use std::io::{File, Open, Write, IoResult};
-use std::num::{FloatMath, ToPrimitive};
+use std::num::{Float, ToPrimitive};
 
 use color::{ColorRGB};
 use table::{Table};

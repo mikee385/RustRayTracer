@@ -5,7 +5,7 @@
 extern crate time;
 
 use std::os::{num_cpus};
-use std::num::{Float, FloatMath};
+use std::num::{Float};
 use std::sync::{Arc, Future};
 
 use color::{ColorRGB};
