@@ -5,7 +5,7 @@ use material::{Material};
 
 use super::scene_object::{SceneObject};
 
-#[derive(PartialEq, PartialOrd, Clone, Show)]
+#[derive(Clone, Show)]
 pub struct Plane {
     origin: Point3D,
     normal: Direction3D,

@@ -4,6 +4,7 @@ use std::num::{Float, ToPrimitive};
 use color::{ColorRGB};
 use table::{Table};
 
+#[derive(Show)]
 pub struct PPMImage {
     file_name: String
 }
