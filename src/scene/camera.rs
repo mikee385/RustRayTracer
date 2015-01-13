@@ -7,7 +7,7 @@ use table::{Table};
 pub struct Camera {   
     position: Point3D,
     orientation: Matrix3D,
-    image_dimensions: (uint, uint),
+    image_dimensions: (usize, usize),
     
     x_min: f32,
     y_max: f32,
@@ -17,10 +17,10 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn from_fov(image_dimensions: (uint, uint), field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let (image_width_uint, image_height_uint) = image_dimensions;
-        let image_width = image_width_uint as f32;
-        let image_height = image_height_uint as f32;
+    pub fn from_fov(image_dimensions: (usize, usize), field_of_view: f32, distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (image_width_usize, image_height_usize) = image_dimensions;
+        let image_width = image_width_usize as f32;
+        let image_height = image_height_usize as f32;
 
         let y_max = (field_of_view / 2.0 * DEGREES_TO_RADIANS).tan() * distance_to_plane;
         let x_min = -y_max * image_width / image_height;
@@ -37,10 +37,10 @@ impl Camera {
         }
     }
     
-    pub fn from_dimensions(image_dimensions: (uint, uint), plane_dimensions: (f32, f32), distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
-        let (image_width_uint, image_height_uint) = image_dimensions;
-        let image_width = image_width_uint as f32;
-        let image_height = image_height_uint as f32;
+    pub fn from_dimensions(image_dimensions: (usize, usize), plane_dimensions: (f32, f32), distance_to_plane: f32, position: &Point3D, look_at_point: &Point3D) -> Camera {
+        let (image_width_usize, image_height_usize) = image_dimensions;
+        let image_width = image_width_usize as f32;
+        let image_height = image_height_usize as f32;
 
         let (plane_width, plane_height) = plane_dimensions;
 
@@ -64,23 +64,23 @@ impl Camera {
         &self.orientation
     }
 
-    pub fn get_image_dimensions(&self) -> (uint, uint) {
+    pub fn get_image_dimensions(&self) -> (usize, usize) {
         self.image_dimensions
     }
     
-    pub fn get_primary_ray(&self, index: (uint, uint)) -> Ray3D {
+    pub fn get_primary_ray(&self, index: (usize, usize)) -> Ray3D {
         let point_in_camera = self.get_pixel_center(index);
         let ray_direction = Direction3D::between_points(&self.position, &self.convert_camera_to_world(&point_in_camera));
         Ray3D::new(&self.position, &ray_direction)
     }
     
-    pub fn get_sub_rays(&self, index: (uint, uint), rays: &mut Table<Ray3D>) {
+    pub fn get_sub_rays(&self, index: (usize, usize), rays: &mut Table<Ray3D>) {
         let (width, height) = rays.get_dimensions();
         if width < 2 {
-            panic!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2u)
+            panic!("Camera::get_sub_rays: `width` of `rays` table is too small ({} < {})", width, 2)
         }
         if height < 2 {
-            panic!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2u)
+            panic!("Camera::get_sub_rays: `height` of `rays` table is too small ({} < {})", height, 2)
         }
         let (row, column) = index;
     
@@ -98,7 +98,7 @@ impl Camera {
         }
     }
     
-    fn get_pixel_center(&self, index: (uint, uint)) -> Point3D {
+    fn get_pixel_center(&self, index: (usize, usize)) -> Point3D {
         let (row, column) = index;
         let x = self.x_min + self.dx * ((column as f32) + 0.5);
         let y = self.y_max - self.dy * ((row as f32) + 0.5);

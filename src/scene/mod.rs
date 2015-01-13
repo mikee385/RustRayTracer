@@ -209,13 +209,13 @@ impl Scene {
 }
 
 struct InternalObject {
-    pub index: uint,
+    pub index: usize,
     pub object: Box<SceneObject+Sync+Send>,
     pub is_light: bool
 }
 
 struct InternalLight {
-    pub index: uint,
+    pub index: usize,
     pub light: Box<SceneLight>
 }
 

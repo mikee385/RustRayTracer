@@ -5,13 +5,13 @@ use std::vec::{Vec, IntoIter};
 
 #[derive(Show)]
 pub struct Table<T> {
-    dimensions: (uint, uint),
+    dimensions: (usize, usize),
     data: Vec<T>
 }
 
 impl<T: Clone> Table<T> {
     #[inline]
-    pub fn from_elem(dimensions: (uint, uint), value: T) -> Table<T> {
+    pub fn from_elem(dimensions: (usize, usize), value: T) -> Table<T> {
         let (width, height) = dimensions;
 
         Table {
@@ -23,7 +23,7 @@ impl<T: Clone> Table<T> {
 
 impl<T> Table<T> {
     #[inline]
-    fn get_vec_index(&self, index: (uint, uint)) -> uint {
+    fn get_vec_index(&self, index: (usize, usize)) -> usize {
         let (row, column) = index;
         let (width, height) = self.dimensions;
 
@@ -38,7 +38,7 @@ impl<T> Table<T> {
     }
 
     #[inline]
-    pub fn get_dimensions(&self) -> (uint, uint) {
+    pub fn get_dimensions(&self) -> (usize, usize) {
         self.dimensions
     }
 
@@ -58,21 +58,21 @@ impl<T> Table<T> {
     }
 }
 
-impl<T> Index<(uint, uint)> for Table<T> {
+impl<T> Index<(usize, usize)> for Table<T> {
     type Output = T;
 
     #[inline]
-    fn index<'a>(&'a self, index: &(uint, uint)) -> &'a T {
+    fn index<'a>(&'a self, index: &(usize, usize)) -> &'a T {
         let vec_index = self.get_vec_index(*index);
         self.data.index(&vec_index)
     }
 }
 
-impl<T> IndexMut<(uint, uint)> for Table<T> {
+impl<T> IndexMut<(usize, usize)> for Table<T> {
     type Output = T;
 
     #[inline]
-    fn index_mut<'a>(&'a mut self, index: &(uint, uint)) -> &'a mut T {
+    fn index_mut<'a>(&'a mut self, index: &(usize, usize)) -> &'a mut T {
         let vec_index = self.get_vec_index(*index);
         self.data.index_mut(&vec_index)
     }
@@ -81,7 +81,7 @@ impl<T> IndexMut<(uint, uint)> for Table<T> {
 #[derive(Show)]
 pub struct TableIter<T: Iterator> {
     iter: T,
-    dimensions: (uint, uint)
+    dimensions: (usize, usize)
 }
 
 impl<T: Iterator> Iterator for TableIter<T> {
@@ -94,12 +94,12 @@ impl<T: Iterator> Iterator for TableIter<T> {
 }
 
 pub trait AsTable<'a, T: Iterator> {
-    fn as_table(self, dimensions: (uint, uint)) -> TableIter<Self>;
+    fn as_table(self, dimensions: (usize, usize)) -> TableIter<Self>;
 }
 
 impl<'a, T: Iterator> AsTable<'a, T> for T {
     #[inline]
-    fn as_table(self, dimensions: (uint, uint)) -> TableIter<Self> {
+    fn as_table(self, dimensions: (usize, usize)) -> TableIter<Self> {
         TableIter {
             iter: self,
             dimensions: dimensions
@@ -110,12 +110,12 @@ impl<'a, T: Iterator> AsTable<'a, T> for T {
 #[derive(Show)]
 pub struct TableEnumerate<T> {
     iter: T,
-    row_count: uint,
-    column_count: uint
+    row_count: usize,
+    column_count: usize
 }
 
 impl<T: Iterator> Iterator for TableEnumerate<TableIter<T>> {
-    type Item = ((uint, uint), T::Item);
+    type Item = ((usize, usize), T::Item);
 
     #[inline]
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
@@ -137,7 +137,7 @@ impl<T: Iterator> Iterator for TableEnumerate<TableIter<T>> {
     }
 
     #[inline]
-    fn size_hint(&self) -> (uint, Option<uint>) {
+    fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
 }
@@ -153,7 +153,7 @@ impl<T> TableIter<T> {
     }
 
     #[inline]
-    pub fn enumerate_2d_from(self, start: (uint, uint)) -> TableEnumerate<TableIter<T>> {
+    pub fn enumerate_2d_from(self, start: (usize, usize)) -> TableEnumerate<TableIter<T>> {
         let (row_start, column_start) = start;
 
         TableEnumerate {
@@ -164,7 +164,7 @@ impl<T> TableIter<T> {
     }
 
     #[inline]
-    pub fn enumerate_2d_from_index(self, index: uint) -> TableEnumerate<TableIter<T>> {
+    pub fn enumerate_2d_from_index(self, index: usize) -> TableEnumerate<TableIter<T>> {
         let (width, _) = self.dimensions;
         let row_start = index / width;
         let column_start = index % width;
