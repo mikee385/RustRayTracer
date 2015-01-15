@@ -4,7 +4,8 @@ extern crate time;
 
 use std::os::{num_cpus};
 use std::num::{Float};
-use std::sync::{Arc, Future};
+use std::sync::{Arc};
+use std::thread::{Thread};
 
 use color::{ColorRGB};
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
@@ -315,10 +316,10 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     };
 
     // Initial Pixel Coloring
-    let initial_coloring_futures = (0..num_threads).map(|thread_index| {
+    let initial_coloring_threads = (0..num_threads).map(|thread_index| {
         let local_camera = camera.clone();
         let local_scene = scene.clone();
-        Future::spawn(move|| {
+        Thread::scoped(move|| {
             let start_index = pixels_per_thread * thread_index;
 
             let num_pixels = if thread_index != num_threads-1 {
@@ -346,11 +347,16 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
 
     // Collect the colored pixels back into the original table.
     let thread_waiting_start = time::precise_time_ns();
-    let intital_coloring = initial_coloring_futures.into_iter().flat_map(|f| f.into_inner().into_iter()).collect::<Vec<_>>();
+    let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| {
+        match f.join() {
+            Ok(local_table) => local_table.into_iter(),
+            Err(e) => panic!(e)
+        }
+    }).collect::<Vec<_>>();
     let thread_waiting_end = time::precise_time_ns();
 
     let pixel_combining_start = time::precise_time_ns();
-    for (pixel, color) in pixel_table.iter_mut().zip(intital_coloring.iter()) {
+    for (pixel, color) in pixel_table.iter_mut().zip(initial_coloring.iter()) {
         *pixel = *color;
     }
     let pixel_combining_end = time::precise_time_ns();
