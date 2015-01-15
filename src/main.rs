@@ -328,24 +328,20 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
                 total_pixels - start_index
             };
 
-            let mut local_table = Vec::with_capacity(num_pixels);
-            for (index, _) in (0..num_pixels).as_table(dimensions).enumerate_2d_from_index(start_index) {
+            (0..num_pixels).as_table(dimensions).enumerate_2d_from_index(start_index).map(|(index, _)| {
                 let ray = local_camera.get_primary_ray(index);
                 let result = local_scene.trace(&ray, 0);
                 
-                let result_color = ColorRGB::from_rgb(
+                ColorRGB::from_rgb(
                     result.color.red.min(1.0),
                     result.color.green.min(1.0),
                     result.color.blue.min(1.0)
-                );
-                local_table.push(result_color);
-            }
-            local_table
+                )
+            }).collect::<Vec<_>>()
         })
     }).collect::<Vec<_>>();
     let thread_setup_end = time::precise_time_ns();
 
-    // Collect the colored pixels back into the original table.
     let thread_waiting_start = time::precise_time_ns();
     let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| {
         match f.join() {
@@ -355,6 +351,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     }).collect::<Vec<_>>();
     let thread_waiting_end = time::precise_time_ns();
 
+    // Collect the colored pixels back into the original table.
     let pixel_combining_start = time::precise_time_ns();
     for (pixel, color) in pixel_table.iter_mut().zip(initial_coloring.iter()) {
         *pixel = *color;
