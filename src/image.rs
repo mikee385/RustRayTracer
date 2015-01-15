@@ -1,5 +1,5 @@
 use std::io::{File, Open, Write, IoResult};
-use std::num::{Float, ToPrimitive};
+use std::num::{Float};
 
 use color::{ColorRGB};
 use table::{Table};
@@ -43,5 +43,5 @@ impl PPMImage {
 }
 
 fn convert_to_u8(value: f32) -> u8 {
-    (value * 255.0).min(255.0).max(0.0).to_u8().unwrap()
+    (value * 255.0).min(255.0).max(0.0) as u8
 }
