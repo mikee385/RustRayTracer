@@ -1,7 +1,7 @@
 use std::num::{Float};
 use std::vec::{Vec};
 
-use geometry::{Vector3D, Ray3D};
+use geometry::{Vector3D, AsVector, Ray3D};
 use color::{ColorRGB};
 
 pub use self::scene_object::{SceneObject};
@@ -118,7 +118,7 @@ impl Scene {
             // Calculate the color from the reflected ray.
             let reflection = surface_material.reflection;
             if reflection > 0.0 {
-                let reflected_direction = (ray_vector - normal_vector * 2.0 * Vector3D::dot(ray_vector, normal_vector)).to_unit();
+                let reflected_direction = (ray_vector - normal_vector * 2.0 * Vector3D::dot(&ray.direction, &normal)).to_unit();
                 let nearby_point = point.translate_dist(&reflected_direction, BIAS);
                 let reflected_result = self.trace(&Ray3D::new(&nearby_point, &reflected_direction), depth + 1);
                 total_ray_color = total_ray_color + reflected_result.color * reflection * surface_material.color;
@@ -129,14 +129,14 @@ impl Scene {
             if refraction > 0.0 {
                 let n;
                 let cos_i;
-                if Vector3D::dot(ray_vector, normal_vector) > 0.0 {
+                if Vector3D::dot(&ray.direction, &normal) > 0.0 {
                     // Internal refraction
                     n = surface_material.refractive_index / self.refractive_index;
-                    cos_i = -Vector3D::dot(ray_vector, (-normal).as_vector());
+                    cos_i = -Vector3D::dot(&ray.direction, &(-normal));
                 } else {
                     // External refraction
                     n = self.refractive_index / surface_material.refractive_index;
-                    cos_i = -Vector3D::dot(ray_vector, normal_vector);
+                    cos_i = -Vector3D::dot(&ray.direction, &normal);
                 }
 
                 let cos2_t = 1.0 - n * n * (1.0 - cos_i * cos_i);
@@ -182,7 +182,7 @@ impl Scene {
                 // Calculate the diffusive lighting from the light.
                 let diffuse = surface_material.diffuse;
                 if diffuse > 0.0 {
-                    let percentage_of_light = Vector3D::dot(normal_vector, direction_to_light_vector);
+                    let percentage_of_light = Vector3D::dot(&normal, &direction_to_light);
                     if percentage_of_light > 0.0 {
                         total_ray_color = total_ray_color + (light_color * surface_material.color) * (shade * diffuse * percentage_of_light);
                     }
@@ -192,8 +192,8 @@ impl Scene {
                 let specular = surface_material.specular;
                 let shininess = surface_material.shininess;
                 if specular > 0.0 && shininess > 0 {
-                    let reflected_direction = (direction_to_light_vector - normal_vector * 2.0 * Vector3D::dot(direction_to_light_vector, normal_vector)).to_unit();
-                    let percentage_of_light = Vector3D::dot(ray_vector, reflected_direction.as_vector());
+                    let reflected_direction = (direction_to_light_vector - normal_vector * 2.0 * Vector3D::dot(&direction_to_light, &normal)).to_unit();
+                    let percentage_of_light = Vector3D::dot(&ray.direction, &reflected_direction);
                     if percentage_of_light > 0.0 {
                         total_ray_color = total_ray_color + light_color * (shade * specular * percentage_of_light.powi(shininess as i32));
                     }

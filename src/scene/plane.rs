@@ -1,6 +1,6 @@
 use std::num::{Float};
 
-use geometry::{EPSILON, Point3D, Vector3D, Direction3D, Ray3D};
+use geometry::{EPSILON, Point3D, Vector3D, AsVector, Direction3D, Ray3D};
 use material::{Material};
 
 use super::scene_object::{SceneObject};
@@ -21,10 +21,11 @@ impl Plane {
         }
     }
     
-    pub fn from_d_vector(d: f32, vector: &Vector3D, material: &Material) -> Plane {
+    pub fn from_d_vector<T: AsVector>(d: f32, vector: &T, material: &Material) -> Plane {
+        let v = vector.as_vector();        
         Plane {
-            origin: Point3D::from_vector(&(*vector * (-d / Vector3D::dot(vector, vector)))),
-            normal: Direction3D::from_vector(vector),
+            origin: Point3D::from_vector(&(*v * (-d / Vector3D::dot(v, v)))),
+            normal: Direction3D::from_vector(v),
             material: *material
         }
     }
@@ -34,18 +35,18 @@ impl Plane {
     }
     
     pub fn get_d(&self) -> f32 {
-        -Vector3D::dot(&Vector3D::from_point(&self.origin), self.normal.as_vector())
+        -Vector3D::dot(&Vector3D::from_point(&self.origin), &self.normal)
     }
 }
 
 impl SceneObject for Plane {
     fn intersect(&self, ray: &Ray3D) -> Option<f32> {
-        let denominator = Vector3D::dot(ray.direction.as_vector(), self.normal.as_vector());
+        let denominator = Vector3D::dot(&ray.direction, &self.normal);
         if denominator.abs() < EPSILON {
             return None;
         }
 
-        let t = Vector3D::dot(&Vector3D::between_points(&ray.origin, &self.origin), self.normal.as_vector()) / denominator;
+        let t = Vector3D::dot(&Vector3D::between_points(&ray.origin, &self.origin), &self.normal) / denominator;
         if t < 0.0 {
             return None;
         }

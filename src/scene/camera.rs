@@ -114,8 +114,8 @@ impl Camera {
 
 fn compute_orientation(position: &Point3D, look_at_point: &Point3D) -> Matrix3D {
     let z = Direction3D::between_points(position, look_at_point);
-    let x = Vector3D::cross(Direction3D::unit_y().as_vector(), z.as_vector()).to_unit();
-    let y = Vector3D::cross(z.as_vector(), x.as_vector()).to_unit();
+    let x = Vector3D::cross(Direction3D::unit_y(), &z).to_unit();
+    let y = Vector3D::cross(&z, &x).to_unit();
     
-    Matrix3D::new(x.as_vector(), y.as_vector(), z.as_vector())
+    Matrix3D::new(&x, &y, &z)
 }

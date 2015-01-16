@@ -1,7 +1,7 @@
 use std::num::{Float};
 use std::ops::{Neg};
 
-use super::{Point3D, Vector3D, Matrix3D};
+use super::{Point3D, Vector3D, AsVector, Matrix3D};
 
 #[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Direction3D {
@@ -31,12 +31,13 @@ impl Direction3D {
         Direction3D::from_vector(&Vector3D::from_point(point))
     }
     
-    pub fn from_vector(vector: &Vector3D) -> Direction3D {
-        let magnitude = vector.magnitude();
+    pub fn from_vector<T: AsVector>(vector: &T) -> Direction3D {
+        let v = vector.as_vector();
+        let magnitude = v.magnitude();
         if magnitude > 0.0 {
-            Direction3D::from_normalized_vector(&vector.scale(1.0 / magnitude))
+            Direction3D::from_normalized_vector(&v.scale(1.0 / magnitude))
         } else {
-            Direction3D::from_normalized_vector(vector)
+            Direction3D::from_normalized_vector(v)
         }
     }
     
@@ -54,10 +55,6 @@ impl Direction3D {
     
     pub fn unit_z() -> &'static Direction3D {
         &DIRECTION3D_UNIT_Z
-    }
-    
-    pub fn as_vector(&self) -> &Vector3D {
-        &self.direction
     }
     
     pub fn x(&self) -> f32 {
@@ -121,13 +118,26 @@ impl Direction3D {
             return Matrix3D::new(&unit_x, &unit_y, unit_z);
         }
     }
+    
+    pub fn eq_tol<T: AsVector>(&self, other: &T, tolerance: f32) -> bool {
+        let v = other.as_vector();
+        (self.direction.x - v.x).abs() < tolerance &&
+        (self.direction.y - v.z).abs() < tolerance &&
+        (self.direction.y - v.z).abs() < tolerance
+    }
+}
+
+impl AsVector for Direction3D {
+    fn as_vector<'a>(&'a self) -> &'a Vector3D {
+        &self.direction
+    }
 }
 
 impl<'a> Neg for &'a Direction3D {
     type Output = Direction3D;
     
     fn neg(self) -> Direction3D {
-        Direction3D::from_normalized_vector(&self.as_vector().neg())
+        Direction3D::from_normalized_vector(&self.direction.neg())
     }
 }
 

@@ -1,6 +1,6 @@
 use std::num::{Float};
 
-use super::{Vector3D, Direction3D, Matrix3D};
+use super::{Vector3D, AsVector, Direction3D, Matrix3D};
 
 #[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
 pub struct Point3D {
@@ -24,11 +24,13 @@ impl Point3D {
         }
     }
     
-    pub fn from_vector(vector: &Vector3D) -> Point3D {
+    pub fn from_vector<T: AsVector>(vector: &T) -> Point3D {
+        let v = vector.as_vector();
+
         Point3D::from_xyz(
-            vector.x, 
-            vector.y, 
-            vector.z
+            v.x, 
+            v.y, 
+            v.z
         )
     }
     
@@ -45,11 +47,13 @@ impl Point3D {
         )
     }
     
-    pub fn translate_vec(&self, vector: &Vector3D) -> Point3D {
+    pub fn translate_vec<T: AsVector>(&self, vector: &T) -> Point3D {
+        let v = vector.as_vector();
+
         Point3D::from_xyz(
-            self.x + vector.x,
-            self.y + vector.y,
-            self.z + vector.z
+            self.x + v.x,
+            self.y + v.y,
+            self.z + v.z
         )
     }
     

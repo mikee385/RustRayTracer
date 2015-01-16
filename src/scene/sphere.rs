@@ -35,7 +35,7 @@ impl Sphere {
 impl SceneObject for Sphere {
     fn intersect(&self, ray: &Ray3D) -> Option<f32> {
         let sphere_to_ray = Vector3D::between_points(&ray.origin, &self.center);
-        let b = Vector3D::dot(&sphere_to_ray, ray.direction.as_vector());
+        let b = Vector3D::dot(&sphere_to_ray, &ray.direction);
         if b < 0.0 {
             return None;
         }

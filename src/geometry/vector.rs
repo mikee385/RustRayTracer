@@ -66,7 +66,7 @@ impl Vector3D {
     }
     
     pub fn projection_dir(&self, direction: &Direction3D) -> Vector3D {
-        direction.as_vector() * Vector3D::dot(self, direction.as_vector())
+        direction.as_vector() * Vector3D::dot(self, direction)
     }
     
     pub fn projection_vec(&self, direction: &Vector3D) -> Vector3D {
@@ -87,26 +87,17 @@ impl Vector3D {
         )
     }
     
-    pub fn eq_tol(&self, other: &Vector3D, tolerance: f32) -> bool {
-        (self.x - other.x).abs() < tolerance &&
-        (self.y - other.z).abs() < tolerance &&
-        (self.y - other.z).abs() < tolerance
+    pub fn eq_tol<T: AsVector>(&self, other: &T, tolerance: f32) -> bool {
+        let v = other.as_vector();
+        (self.x - v.x).abs() < tolerance &&
+        (self.y - v.z).abs() < tolerance &&
+        (self.y - v.z).abs() < tolerance
     }
+}
 
-    pub fn dot(vector1: &Vector3D, vector2: &Vector3D) -> f32
-    {
-        vector1.x * vector2.x + 
-        vector1.y * vector2.y + 
-        vector1.z * vector2.z
-    }
-
-    pub fn cross(vector1: &Vector3D, vector2: &Vector3D) -> Vector3D
-    {
-        Vector3D::from_xyz(
-            vector1.y * vector2.z - vector1.z * vector2.y,
-            vector1.z * vector2.x - vector1.x * vector2.z,
-            vector1.x * vector2.y - vector1.y * vector2.x
-        )
+impl AsVector for Vector3D {
+    fn as_vector<'a>(&'a self) -> &'a Vector3D {
+        self
     }
 }
 
@@ -232,5 +223,33 @@ impl Neg for Vector3D {
     
     fn neg(self) -> Vector3D {
         -&self
+    }
+}
+
+pub trait AsVector {
+    fn as_vector<'a>(&'a self) -> &'a Vector3D;
+}
+
+impl Vector3D {
+    pub fn dot<T: AsVector, U: AsVector>(vector1: &T, vector2: &U) -> f32
+    {
+        let v1 = vector1.as_vector();
+        let v2 = vector2.as_vector();
+
+        v1.x * v2.x + 
+        v1.y * v2.y + 
+        v1.z * v2.z
+    }
+
+    pub fn cross<T: AsVector, U: AsVector>(vector1: &T, vector2: &U) -> Vector3D
+    {
+        let v1 = vector1.as_vector();
+        let v2 = vector2.as_vector();
+
+        Vector3D::from_xyz(
+            v1.y * v2.z - v1.z * v2.y,
+            v1.z * v2.x - v1.x * v2.z,
+            v1.x * v2.y - v1.y * v2.x
+        )
     }
 }
