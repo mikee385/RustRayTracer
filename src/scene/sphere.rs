@@ -16,10 +16,10 @@ pub struct Sphere {
 impl Sphere {
     pub fn new(center: &Point3D, radius: f32, material: &Material) -> Sphere {
         Sphere {
-            center: *center,
+            center: center.clone(),
             radius: radius,
             radius_squared: radius * radius,
-            material: *material
+            material: material.clone()
         }
     }
     
@@ -59,6 +59,6 @@ impl SceneObject for Sphere {
     }
     
     fn get_material(&self, _: &Point3D) -> Material {
-        self.material
+        self.material.clone()
     }
 }

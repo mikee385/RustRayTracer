@@ -1,6 +1,6 @@
 use super::{Point3D, Direction3D};
 
-#[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Show)]
 pub struct Ray3D {
     pub origin: Point3D,
     pub direction: Direction3D
@@ -9,8 +9,8 @@ pub struct Ray3D {
 impl Ray3D {
     pub fn new(origin: &Point3D, direction: &Direction3D) -> Ray3D {
         Ray3D { 
-            origin: *origin,
-            direction: *direction
+            origin: origin.clone(),
+            direction: direction.clone()
         }
     }
     

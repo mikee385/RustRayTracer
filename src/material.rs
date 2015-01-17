@@ -1,6 +1,6 @@
 use color::ColorRGB;
 
-#[derive(Copy, Clone, Show)]
+#[derive(Clone, Show)]
 pub struct Material {
     pub color: ColorRGB,
     pub diffuse: f32,
@@ -14,7 +14,7 @@ pub struct Material {
 impl Material {
     pub fn new(color: &ColorRGB) -> Material {
         Material {
-            color: *color,
+            color: color.clone(),
             diffuse: 1.0,
             specular: 0.0,
             shininess: 0,
@@ -40,7 +40,7 @@ impl MaterialBuilder {
 
     pub fn new() -> MaterialBuilder {
         MaterialBuilder {
-            color: *ColorRGB::white(),
+            color: ColorRGB::white().clone(),
             diffuse: 1.0,
             specular: 0.0,
             shininess: 0,
@@ -51,7 +51,7 @@ impl MaterialBuilder {
     }
 
     pub fn color(&mut self, color: &ColorRGB) -> &mut MaterialBuilder {
-        self.color = *color;
+        self.color = color.clone();
         self
     }
 
@@ -87,7 +87,7 @@ impl MaterialBuilder {
     
     pub fn to_material(&self) -> Material {
         Material {
-            color: self.color, 
+            color: self.color.clone(), 
             diffuse: self.diffuse, 
             specular: self.specular, 
             shininess: self.shininess, 

@@ -3,7 +3,7 @@ use std::ops::{Neg};
 
 use super::{Point3D, Vector3D, AsVector, Matrix3D};
 
-#[derive(PartialEq, PartialOrd, Copy, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Show)]
 pub struct Direction3D {
     direction: Vector3D
 }
@@ -42,7 +42,7 @@ impl Direction3D {
     }
     
     fn from_normalized_vector(normalized_vector: &Vector3D) -> Direction3D {
-        Direction3D {direction: *normalized_vector}
+        Direction3D {direction: normalized_vector.clone()}
     }
     
     pub fn unit_x() -> &'static Direction3D {
@@ -137,7 +137,7 @@ impl<'a> Neg for &'a Direction3D {
     type Output = Direction3D;
     
     fn neg(self) -> Direction3D {
-        Direction3D::from_normalized_vector(&self.direction.neg())
+        Direction3D::from_normalized_vector(&-(&self.direction))
     }
 }
 

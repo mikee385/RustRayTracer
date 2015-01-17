@@ -288,7 +288,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let dimensions = camera.get_image_dimensions();
     let (width, height) = dimensions;
 
-    let mut pixel_table = Table::from_elem(dimensions, *ColorRGB::black());
+    let mut pixel_table = Table::from_elem(dimensions, ColorRGB::black().clone());
 
     // Initial Pixel Coloring
     // let intital_coloring_start = time::precise_time_ns();
@@ -354,7 +354,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     // Collect the colored pixels back into the original table.
     let pixel_combining_start = time::precise_time_ns();
     for (pixel, color) in pixel_table.iter_mut().zip(initial_coloring.iter()) {
-        *pixel = *color;
+        *pixel = color.clone();
     }
     let pixel_combining_end = time::precise_time_ns();
     
@@ -364,14 +364,14 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     for (index, value) in is_edge.iter_mut().enumerate_2d() {
         let (row, column) = index;
         if row != 0 && column != 0 && row != height-1 && column != width-1 {
-            let p1 = pixel_table[(row - 1, column - 1)];
-            let p2 = pixel_table[(row - 1, column)];
-            let p3 = pixel_table[(row - 1, column + 1)];
-            let p4 = pixel_table[(row, column - 1)];
-            let p6 = pixel_table[(row, column + 1)];
-            let p7 = pixel_table[(row + 1, column - 1)];
-            let p8 = pixel_table[(row + 1, column)];
-            let p9 = pixel_table[(row + 1, column + 1)];
+            let ref p1 = pixel_table[(row - 1, column - 1)];
+            let ref p2 = pixel_table[(row - 1, column)];
+            let ref p3 = pixel_table[(row - 1, column + 1)];
+            let ref p4 = pixel_table[(row, column - 1)];
+            let ref p6 = pixel_table[(row, column + 1)];
+            let ref p7 = pixel_table[(row + 1, column - 1)];
+            let ref p8 = pixel_table[(row + 1, column)];
+            let ref p9 = pixel_table[(row + 1, column + 1)];
 
             let r = calculate_gradient(p1.red, p2.red, p3.red, p4.red, p6.red, p7.red, p8.red, p9.red);
             let g = calculate_gradient(p1.green, p2.green, p3.green, p4.green, p6.green, p7.green, p8.green, p9.green);
@@ -394,7 +394,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let mut sub_rays = Table::from_elem((sub_width, sub_height), Ray3D::new(Point3D::origin(), Direction3D::unit_x()));
     for (index, value) in pixel_table.iter_mut().enumerate_2d() {
         if is_edge[index] {
-            let mut pixel_color = *ColorRGB::black();
+            let mut pixel_color = ColorRGB::black().clone();
             
             camera.get_sub_rays(index, &mut sub_rays);
             for sub_ray in sub_rays.iter() {

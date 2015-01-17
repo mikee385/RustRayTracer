@@ -1,7 +1,8 @@
 use std::num::{Float};
+use std::ops::{Neg};
 use std::vec::{Vec};
 
-use geometry::{Vector3D, AsVector, Ray3D};
+use geometry::{Vector3D, AsVector, Direction3D, Ray3D};
 use color::{ColorRGB};
 
 pub use self::scene_object::{SceneObject};
@@ -30,7 +31,7 @@ pub struct Scene {
 impl Scene {
     pub fn new(background_color: &ColorRGB, refractive_index: f32, max_ray_depth: u32) -> Scene {
         Scene {
-            background_color: *background_color,
+            background_color: background_color.clone(),
             refractive_index: refractive_index,
             max_ray_depth: max_ray_depth,
             items: Vec::new(),
@@ -83,7 +84,7 @@ impl Scene {
         // If the ray doesn't hit any objects, return the background color.
         if optional_nearest.is_none() {
             return TraceResult {
-                color: self.background_color, 
+                color: self.background_color.clone(), 
                 distance: 0.0
             };
         }
@@ -110,7 +111,7 @@ impl Scene {
         let normal_vector = normal.as_vector();
         
         // Calculate the color at the intersection point.
-        let mut total_ray_color = *ColorRGB::black();
+        let mut total_ray_color = ColorRGB::black().clone();
         
         if depth < self.max_ray_depth {
             // TODO: Add Fresnel effects (?)
@@ -121,7 +122,7 @@ impl Scene {
                 let reflected_direction = (ray_vector - normal_vector * 2.0 * Vector3D::dot(&ray.direction, &normal)).to_unit();
                 let nearby_point = point.translate_dist(&reflected_direction, BIAS);
                 let reflected_result = self.trace(&Ray3D::new(&nearby_point, &reflected_direction), depth + 1);
-                total_ray_color = total_ray_color + reflected_result.color * reflection * surface_material.color;
+                total_ray_color = &total_ray_color + &reflected_result.color * reflection * &surface_material.color;
             }
 
             // Calculate the color from the refracted ray.
@@ -132,7 +133,7 @@ impl Scene {
                 if Vector3D::dot(&ray.direction, &normal) > 0.0 {
                     // Internal refraction
                     n = surface_material.refractive_index / self.refractive_index;
-                    cos_i = -Vector3D::dot(&ray.direction, &(-normal));
+                    cos_i = -Vector3D::dot(&ray.direction, &(-&normal));
                 } else {
                     // External refraction
                     n = self.refractive_index / surface_material.refractive_index;
@@ -146,9 +147,9 @@ impl Scene {
                     let refracted_result = self.trace(&Ray3D::new(&nearby_point, &refracted_direction), depth + 1);
 
                     // Beer's Law
-                    let absorbance = surface_material.color * (0.15 * -refracted_result.distance);
+                    let absorbance = &surface_material.color * (0.15 * -refracted_result.distance);
                     let transparency = ColorRGB::from_rgb(absorbance.red.exp(), absorbance.green.exp(), absorbance.blue.exp());
-                    total_ray_color = total_ray_color + refracted_result.color * transparency;
+                    total_ray_color = &total_ray_color + &refracted_result.color * transparency;
                 }
             }
         }
@@ -184,7 +185,7 @@ impl Scene {
                 if diffuse > 0.0 {
                     let percentage_of_light = Vector3D::dot(&normal, &direction_to_light);
                     if percentage_of_light > 0.0 {
-                        total_ray_color = total_ray_color + (light_color * surface_material.color) * (shade * diffuse * percentage_of_light);
+                        total_ray_color = &total_ray_color + (&light_color * &surface_material.color) * (shade * diffuse * percentage_of_light);
                     }
                 }
 
@@ -195,7 +196,7 @@ impl Scene {
                     let reflected_direction = (direction_to_light_vector - normal_vector * 2.0 * Vector3D::dot(&direction_to_light, &normal)).to_unit();
                     let percentage_of_light = Vector3D::dot(&ray.direction, &reflected_direction);
                     if percentage_of_light > 0.0 {
-                        total_ray_color = total_ray_color + light_color * (shade * specular * percentage_of_light.powi(shininess as i32));
+                        total_ray_color = &total_ray_color + &light_color * (shade * specular * percentage_of_light.powi(shininess as i32));
                     }
                 }
             }

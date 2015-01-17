@@ -26,7 +26,7 @@ impl Camera {
         let x_min = -y_max * image_width / image_height;
 
         Camera {
-            position: *position,
+            position: position.clone(),
             orientation: compute_orientation(position, look_at_point),
             image_dimensions: image_dimensions,
             x_min: x_min,
@@ -45,7 +45,7 @@ impl Camera {
         let (plane_width, plane_height) = plane_dimensions;
 
         Camera {
-            position: *position,
+            position: position.clone(),
             orientation: compute_orientation(position, look_at_point),
             image_dimensions: image_dimensions,
             x_min: -plane_width / 2.0,

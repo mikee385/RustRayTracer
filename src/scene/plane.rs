@@ -15,18 +15,18 @@ pub struct Plane {
 impl Plane {
     pub fn from_origin_normal(origin: &Point3D, normal: &Direction3D, material: &Material) -> Plane {
         Plane {
-            origin: *origin,
-            normal: *normal,
-            material: *material
+            origin: origin.clone(),
+            normal: normal.clone(),
+            material: material.clone()
         }
     }
     
     pub fn from_d_vector<T: AsVector>(d: f32, vector: &T, material: &Material) -> Plane {
         let v = vector.as_vector();        
         Plane {
-            origin: Point3D::from_vector(&(*v * (-d / Vector3D::dot(v, v)))),
+            origin: Point3D::from_vector(&(v * (-d / Vector3D::dot(v, v)))),
             normal: Direction3D::from_vector(v),
-            material: *material
+            material: material.clone()
         }
     }
     
@@ -55,10 +55,10 @@ impl SceneObject for Plane {
     }
     
     fn get_normal(&self, _: &Point3D) -> Direction3D {
-        self.normal
+        self.normal.clone()
     }
     
     fn get_material(&self, _: &Point3D) -> Material {
-        self.material
+        self.material.clone()
     }
 }
