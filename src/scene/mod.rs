@@ -1,8 +1,7 @@
 use std::num::{Float};
-use std::ops::{Neg};
 use std::vec::{Vec};
 
-use geometry::{Vector3D, AsVector, Direction3D, Ray3D};
+use geometry::{Vector3D, Ray3D};
 use color::{ColorRGB};
 
 pub use self::scene_object::{SceneObject};
