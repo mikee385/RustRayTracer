@@ -1,5 +1,5 @@
 use std::num::{Float};
-use std::ops::{Neg};
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 use super::{Point3D, Vector3D, AsVector, Matrix3D};
 
@@ -127,11 +127,18 @@ impl Direction3D {
     }
 }
 
+//------------------------------------------------------------------------------
+
 impl AsVector for Direction3D {
     fn as_vector<'a>(&'a self) -> &'a Vector3D {
         &self.direction
     }
 }
+
+as_vector_add!(Direction3D);
+as_vector_sub!(Direction3D);
+as_vector_mul!(Direction3D);
+as_vector_div!(Direction3D);
 
 impl<'a> Neg for &'a Direction3D {
     type Output = Direction3D;

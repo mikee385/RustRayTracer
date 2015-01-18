@@ -95,136 +95,7 @@ impl Vector3D {
     }
 }
 
-impl AsVector for Vector3D {
-    fn as_vector<'a>(&'a self) -> &'a Vector3D {
-        self
-    }
-}
-
-impl<'a, 'b> Add<&'a Vector3D> for &'b Vector3D {
-    type Output = Vector3D;
-    
-    fn add(self, other: &Vector3D) -> Vector3D {
-        Vector3D::from_xyz(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z
-        )
-    }
-}
-
-impl<'a> Add<&'a Vector3D> for Vector3D {
-    type Output = Vector3D;
-    
-    fn add(self, other: &Vector3D) -> Vector3D {
-        &self + other
-    }
-}
-
-impl<'a> Add<Vector3D> for &'a Vector3D {
-    type Output = Vector3D;
-    
-    fn add(self, other: Vector3D) -> Vector3D {
-        self + &other
-    }
-}
-
-impl Add<Vector3D> for Vector3D {
-    type Output = Vector3D;
-    
-    fn add(self, other: Vector3D) -> Vector3D {
-        &self + &other
-    }
-}
-
-impl<'a, 'b> Sub<&'a Vector3D> for &'b Vector3D {
-    type Output = Vector3D;
-    
-    fn sub(self, other: &Vector3D) -> Vector3D {
-        Vector3D::from_xyz(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z
-        )
-    }
-}
-
-impl<'a> Sub<&'a Vector3D> for Vector3D {
-    type Output = Vector3D;
-    
-    fn sub(self, other: &Vector3D) -> Vector3D {
-        &self - other
-    }
-}
-
-impl<'a> Sub<Vector3D> for &'a Vector3D {
-    type Output = Vector3D;
-    
-    fn sub(self, other: Vector3D) -> Vector3D {
-        self - &other
-    }
-}
-
-impl Sub<Vector3D> for Vector3D {
-    type Output = Vector3D;
-    
-    fn sub(self, other: Vector3D) -> Vector3D {
-        &self - &other
-    }
-}
-
-impl<'a> Mul<f32> for &'a Vector3D {
-    type Output = Vector3D;
-    
-    fn mul(self, scale: f32) -> Vector3D {
-        self.scale(scale)        
-    }
-}
-
-impl Mul<f32> for Vector3D {
-    type Output = Vector3D;
-    
-    fn mul(self, scale: f32) -> Vector3D {
-        &self * scale
-    }
-}
-
-impl<'a> Div<f32> for &'a Vector3D {
-    type Output = Vector3D;
-    
-    fn div(self, scale: f32) -> Vector3D {
-        let inv_scale = 1.0 / scale;
-        self.scale(inv_scale)        
-    }
-}
-
-impl Div<f32> for Vector3D {
-    type Output = Vector3D;
-    
-    fn div(self, scale: f32) -> Vector3D {
-        &self / scale       
-    }
-}
-
-impl<'a> Neg for &'a Vector3D {
-    type Output = Vector3D;
-    
-    fn neg(self) -> Vector3D {
-        Vector3D::from_xyz(
-            -self.x,
-            -self.y,
-            -self.z
-        )
-    }
-}
-
-impl Neg for Vector3D {
-    type Output = Vector3D;
-    
-    fn neg(self) -> Vector3D {
-        -&self
-    }
-}
+//------------------------------------------------------------------------------
 
 pub trait AsVector {
     fn as_vector<'a>(&'a self) -> &'a Vector3D;
@@ -251,5 +122,165 @@ impl Vector3D {
             v1.z * v2.x - v1.x * v2.z,
             v1.x * v2.y - v1.y * v2.x
         )
+    }
+}
+
+macro_rules! as_vector_add {
+    ($T:ty) => (
+        impl<'a, 'b, U: AsVector> Add<&'a U> for &'b $T {
+            type Output = Vector3D;
+            
+            fn add(self, other: &U) -> Vector3D {
+                let v1 = self.as_vector();
+                let v2 = other.as_vector();
+
+                Vector3D::from_xyz(
+                    v1.x + v2.x,
+                    v1.y + v2.y,
+                    v1.z + v2.z
+                )
+            }
+        }
+
+        impl<'a, U: AsVector> Add<&'a U> for $T {
+            type Output = Vector3D;
+            
+            fn add(self, other: &U) -> Vector3D {
+                &self + other
+            }
+        }
+
+        impl<'a, U: AsVector> Add<U> for &'a $T {
+            type Output = Vector3D;
+            
+            fn add(self, other: U) -> Vector3D {
+                self + &other
+            }
+        }
+
+        impl<U: AsVector> Add<U> for $T {
+            type Output = Vector3D;
+            
+            fn add(self, other: U) -> Vector3D {
+                &self + &other
+            }
+        }
+    )
+}
+
+macro_rules! as_vector_sub {
+    ($T:ty) => (
+        impl<'a, 'b, U: AsVector> Sub<&'a U> for &'b $T {
+            type Output = Vector3D;
+            
+            fn sub(self, other: &U) -> Vector3D {
+                let v1 = self.as_vector();
+                let v2 = other.as_vector();
+
+                Vector3D::from_xyz(
+                    v1.x - v2.x,
+                    v1.y - v2.y,
+                    v1.z - v2.z
+                )
+            }
+        }
+
+        impl<'a, U: AsVector> Sub<&'a U> for $T {
+            type Output = Vector3D;
+            
+            fn sub(self, other: &U) -> Vector3D {
+                &self - other
+            }
+        }
+
+        impl<'a, U: AsVector> Sub<U> for &'a $T {
+            type Output = Vector3D;
+            
+            fn sub(self, other: U) -> Vector3D {
+                self - &other
+            }
+        }
+
+        impl<U: AsVector> Sub<U> for $T {
+            type Output = Vector3D;
+            
+            fn sub(self, other: U) -> Vector3D {
+                &self - &other
+            }
+        }
+    )
+}
+
+macro_rules! as_vector_mul {
+    ($T:ty) => (
+        impl<'a> Mul<f32> for &'a $T {
+            type Output = Vector3D;
+            
+            fn mul(self, scale: f32) -> Vector3D {
+                self.as_vector().scale(scale)
+            }
+        }
+
+        impl Mul<f32> for $T {
+            type Output = Vector3D;
+            
+            fn mul(self, scale: f32) -> Vector3D {
+                &self * scale
+            }
+        }
+    )
+}
+
+macro_rules! as_vector_div {
+    ($T:ty) => (
+        impl<'a> Div<f32> for &'a $T {
+            type Output = Vector3D;
+            
+            fn div(self, scale: f32) -> Vector3D {
+                let inv_scale = 1.0 / scale;
+                self.as_vector().scale(inv_scale)        
+            }
+        }
+
+        impl Div<f32> for $T {
+            type Output = Vector3D;
+            
+            fn div(self, scale: f32) -> Vector3D {
+                &self / scale       
+            }
+        }
+    )
+}
+
+//------------------------------------------------------------------------------
+
+impl AsVector for Vector3D {
+    fn as_vector<'a>(&'a self) -> &'a Vector3D {
+        self
+    }
+}
+
+as_vector_add!(Vector3D);
+as_vector_sub!(Vector3D);
+as_vector_mul!(Vector3D);
+as_vector_div!(Vector3D);
+
+impl<'a> Neg for &'a Vector3D {
+    type Output = Vector3D;
+    
+    fn neg(self) -> Vector3D {
+        Vector3D::from_xyz(
+            -self.x,
+            -self.y,
+            -self.z
+        )
+    }
+}
+
+impl Neg for Vector3D {
+    type Output = Vector3D;
+    
+    fn neg(self) -> Vector3D {
+        -&self
     }
 }

@@ -6,8 +6,10 @@ pub use self::direction::{Direction3D};
 pub use self::ray::{Ray3D};
 pub use self::matrix::{Matrix3D};
 
-pub mod point;
+#[macro_use]
 pub mod vector;
+
+pub mod point;
 pub mod direction;
 pub mod ray;
 pub mod matrix;

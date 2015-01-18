@@ -107,9 +107,6 @@ impl Scene {
         let normal = nearest_item.object.get_normal(&point);
         let surface_material = nearest_item.object.get_material(&point);
         
-        let ray_vector = ray.direction.as_vector();
-        let normal_vector = normal.as_vector();
-        
         // Calculate the color at the intersection point.
         let mut total_ray_color = ColorRGB::black().clone();
         
@@ -119,7 +116,7 @@ impl Scene {
             // Calculate the color from the reflected ray.
             let reflection = surface_material.reflection;
             if reflection > 0.0 {
-                let reflected_direction = (ray_vector - normal_vector * 2.0 * Vector3D::dot(&ray.direction, &normal)).to_unit();
+                let reflected_direction = (&ray.direction - &normal * 2.0 * Vector3D::dot(&ray.direction, &normal)).to_unit();
                 let nearby_point = point.translate_dist(&reflected_direction, BIAS);
                 let reflected_result = self.trace(&Ray3D::new(&nearby_point, &reflected_direction), depth + 1);
                 total_ray_color = &total_ray_color + &reflected_result.color * reflection * &surface_material.color;
@@ -142,7 +139,7 @@ impl Scene {
 
                 let cos2_t = 1.0 - n * n * (1.0 - cos_i * cos_i);
                 if cos2_t > 0.0 {
-                    let refracted_direction = (ray_vector * n + normal_vector * (n * cos_i - (cos2_t).sqrt())).to_unit();
+                    let refracted_direction = (&ray.direction * n + &normal * (n * cos_i - (cos2_t).sqrt())).to_unit();
                     let nearby_point = point.translate_dist(&refracted_direction, BIAS);
                     let refracted_result = self.trace(&Ray3D::new(&nearby_point, &refracted_direction), depth + 1);
 
@@ -161,7 +158,6 @@ impl Scene {
             let vector_to_light = Vector3D::between_points(&point, light.get_center());
             let distance_to_light = vector_to_light.magnitude();
             let direction_to_light = vector_to_light.to_unit();
-            let direction_to_light_vector = direction_to_light.as_vector();
 
             // Calculate the shading from the light.
             let mut shade: f32 = 1.0;
@@ -193,7 +189,7 @@ impl Scene {
                 let specular = surface_material.specular;
                 let shininess = surface_material.shininess;
                 if specular > 0.0 && shininess > 0 {
-                    let reflected_direction = (direction_to_light_vector - normal_vector * 2.0 * Vector3D::dot(&direction_to_light, &normal)).to_unit();
+                    let reflected_direction = (&direction_to_light - &normal * 2.0 * Vector3D::dot(&direction_to_light, &normal)).to_unit();
                     let percentage_of_light = Vector3D::dot(&ray.direction, &reflected_direction);
                     if percentage_of_light > 0.0 {
                         total_ray_color = &total_ray_color + &light_color * (shade * specular * percentage_of_light.powi(shininess as i32));
