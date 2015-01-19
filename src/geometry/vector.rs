@@ -66,7 +66,7 @@ impl Vector3D {
     }
     
     pub fn projection_dir(&self, direction: &Direction3D) -> Vector3D {
-        direction.as_vector() * Vector3D::dot(self, direction)
+        direction * Vector3D::dot(self, direction)
     }
     
     pub fn projection_vec(&self, direction: &Vector3D) -> Vector3D {

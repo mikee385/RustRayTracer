@@ -28,8 +28,8 @@ impl Matrix3D {
     
     pub fn to_orthonormal_basis(&self) -> Matrix3D {
         let unit_x = self.x.to_unit();        
-        let unit_y = (&self.y - unit_x.as_vector() * Vector3D::dot(&unit_x, &self.y)).to_unit();        
-        let unit_z = (&self.z - unit_x.as_vector() * Vector3D::dot(&unit_x, &self.z) - unit_y.as_vector() * Vector3D::dot(&unit_y, &self.z)).to_unit();
+        let unit_y = (&self.y - &unit_x * Vector3D::dot(&unit_x, &self.y)).to_unit();        
+        let unit_z = (&self.z - &unit_x * Vector3D::dot(&unit_x, &self.z) - &unit_y * Vector3D::dot(&unit_y, &self.z)).to_unit();
 
         Matrix3D::new(&unit_x, &unit_y, &unit_z)
     }
