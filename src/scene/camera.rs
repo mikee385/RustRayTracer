@@ -69,9 +69,14 @@ impl Camera {
     }
     
     pub fn get_primary_ray(&self, index: (usize, usize)) -> Ray3D {
-        let point_in_camera = self.get_pixel_center(index);
-        let ray_direction = Direction3D::between_points(&self.position, &self.convert_camera_to_world(&point_in_camera));
-        Ray3D::new(&self.position, &ray_direction)
+        let (row, column) = index;
+        let x = self.x_min + self.dx * ((column as f32) + 0.5);
+        let y = self.y_max - self.dy * ((row as f32) + 0.5);
+        let z = self.distance_to_plane;
+
+        let direction_in_camera = Vector3D::from_xyz(x, y, z);
+        let direction_in_world = direction_in_camera.rotate(&self.orientation).to_unit();
+        Ray3D::new(&self.position, &direction_in_world)
     }
     
     pub fn get_sub_rays(&self, index: (usize, usize), rays: &mut Table<Ray3D>) {
@@ -92,23 +97,13 @@ impl Camera {
         let z0 = self.distance_to_plane;
 
         for ((row, column), value) in rays.iter_mut().enumerate_2d() {
-                let point_in_camera = Point3D::from_xyz(x0 + (column as f32)*x_step, y0 - (row as f32)*y_step, z0);
-                let ray_direction = Direction3D::between_points(&self.position, &self.convert_camera_to_world(&point_in_camera));
-                *value = Ray3D::new(&self.position, &ray_direction);
-        }
-    }
-    
-    fn get_pixel_center(&self, index: (usize, usize)) -> Point3D {
-        let (row, column) = index;
-        let x = self.x_min + self.dx * ((column as f32) + 0.5);
-        let y = self.y_max - self.dy * ((row as f32) + 0.5);
-        let z = self.distance_to_plane;
+                let x = x0 + (column as f32)*x_step;
+                let y = y0 - (row as f32)*y_step;
 
-        Point3D::from_xyz(x, y, z)
-    }
-    
-    fn convert_camera_to_world(&self, point_in_camera: &Point3D) -> Point3D {
-        point_in_camera.rotate(&self.orientation).translate_vec(&Vector3D::from_point(&self.position))
+                let direction_in_camera = Vector3D::from_xyz(x, y, z0);
+                let direction_in_world = direction_in_camera.rotate(&self.orientation).to_unit();
+                *value = Ray3D::new(&self.position, &direction_in_world);
+        }
     }
 }
 

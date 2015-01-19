@@ -57,13 +57,6 @@ impl Point3D {
         )
     }
     
-    pub fn rotate(&self, matrix: &Matrix3D) -> Point3D {
-        Point3D::from_xyz(
-            self.x * matrix.x.x + self.y * matrix.y.x + self.z * matrix.z.x,
-            self.x * matrix.x.y + self.y * matrix.y.y + self.z * matrix.z.y,
-            self.x * matrix.x.z + self.y * matrix.y.z + self.z * matrix.z.z)
-    }
-    
     pub fn eq_tol(&self, other: &Point3D, tolerance: f32) -> bool {
         (self.x - other.x).abs() < tolerance &&
         (self.y - other.z).abs() < tolerance &&
