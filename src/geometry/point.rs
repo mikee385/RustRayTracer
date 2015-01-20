@@ -1,6 +1,6 @@
 use std::num::{Float};
 
-use super::{Vector3D, AsVector, Direction3D, Matrix3D};
+use super::{Vector3D, AsVector, Direction3D};
 
 #[derive(PartialEq, PartialOrd, Clone, Show)]
 pub struct Point3D {
