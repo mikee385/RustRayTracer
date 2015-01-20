@@ -125,6 +125,7 @@ impl Vector3D {
     }
 }
 
+#[macro_export]
 macro_rules! as_vector_add {
     ($T:ty) => (
         impl<'a, 'b, U: AsVector> Add<&'a U> for &'b $T {
@@ -168,6 +169,7 @@ macro_rules! as_vector_add {
     )
 }
 
+#[macro_export]
 macro_rules! as_vector_sub {
     ($T:ty) => (
         impl<'a, 'b, U: AsVector> Sub<&'a U> for &'b $T {
@@ -211,6 +213,7 @@ macro_rules! as_vector_sub {
     )
 }
 
+#[macro_export]
 macro_rules! as_vector_mul {
     ($T:ty) => (
         impl<'a> Mul<f32> for &'a $T {
@@ -231,6 +234,7 @@ macro_rules! as_vector_mul {
     )
 }
 
+#[macro_export]
 macro_rules! as_vector_div {
     ($T:ty) => (
         impl<'a> Div<f32> for &'a $T {
