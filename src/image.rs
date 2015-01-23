@@ -17,7 +17,7 @@ impl PPMImage {
     }
     
     pub fn save(&self, image: &Table<ColorRGB>) -> IoResult<()> {
-        let file_path = Path::new(self.file_name.as_slice());
+        let file_path = Path::new(&self.file_name);
         let mut file = try!(File::open_mode(&file_path, Open, Write));
 
         let (width, height) = image.get_dimensions();

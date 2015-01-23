@@ -265,7 +265,7 @@ fn main() {
 
     let image_saving_start = time::precise_time_ns();
 
-    let image = PPMImage::new(format!("example{}.ppm", EXAMPLE_TO_RUN).as_slice());
+    let image = PPMImage::new(&*format!("example{}.ppm", EXAMPLE_TO_RUN));
     let result = image.save(&pixel_table);
 
     let image_saving_end = time::precise_time_ns();
