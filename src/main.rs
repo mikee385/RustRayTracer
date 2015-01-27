@@ -237,8 +237,8 @@ fn main() {
         ));
         scene.add_object(ceiling_plane);
 
-        for x in 0..8 {
-            for y in 0..7 {
+        for x in 0u32..8 {
+            for y in 0u32..7 {
                 let grid_sphere = Box::new(Sphere::new(&Point3D::from_xyz(-4.5 + (x as f32) * 1.5, -4.3 + (y as f32) * 1.5, 10.0), 0.3, &MaterialBuilder::new()
                     .color(&ColorRGB::from_rgb(0.3, 1.0, 0.4))
                     .diffuse(0.6)
