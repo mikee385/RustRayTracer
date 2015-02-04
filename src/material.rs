@@ -1,6 +1,6 @@
 use color::ColorRGB;
 
-#[derive(Clone, Show)]
+#[derive(Clone, Debug)]
 pub struct Material {
     pub color: ColorRGB,
     pub diffuse: f32,
@@ -25,7 +25,7 @@ impl Material {
     }
 }
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct MaterialBuilder {
     color: ColorRGB,
     diffuse: f32,

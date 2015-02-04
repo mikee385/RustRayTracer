@@ -1,10 +1,10 @@
-use std::io::{File, Open, Write, IoResult};
+use std::old_io::{File, Open, Write, IoResult};
 use std::num::{Float};
 
 use color::{ColorRGB};
 use table::{Table};
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct PPMImage {
     file_name: String
 }

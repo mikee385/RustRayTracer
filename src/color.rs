@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul};
 
-#[derive(PartialEq, PartialOrd, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Debug)]
 pub struct ColorRGB {
     pub red: f32,
     pub green: f32,

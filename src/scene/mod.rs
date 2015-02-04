@@ -215,7 +215,7 @@ struct InternalLight {
     pub light: Box<SceneLight>
 }
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct TraceResult {
     pub color: ColorRGB,
     pub distance: f32

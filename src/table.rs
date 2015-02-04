@@ -3,7 +3,7 @@ use std::ops::{Index, IndexMut};
 use std::slice::{Iter, IterMut};
 use std::vec::{Vec, IntoIter};
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct Table<T> {
     dimensions: (usize, usize),
     data: Vec<T>
@@ -78,7 +78,7 @@ impl<T> IndexMut<(usize, usize)> for Table<T> {
     }
 }
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct TableIter<T: Iterator> {
     iter: T,
     dimensions: (usize, usize)
@@ -107,7 +107,7 @@ impl<'a, T: Iterator> AsTable<'a, T> for T {
     }
 }
 
-#[derive(Show)]
+#[derive(Debug)]
 pub struct TableEnumerate<T> {
     iter: T,
     row_count: usize,

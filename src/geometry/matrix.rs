@@ -1,6 +1,6 @@
 use super::{Vector3D, AsVector};
 
-#[derive(PartialEq, PartialOrd, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Debug)]
 pub struct Matrix3D {
     pub x: Vector3D,
     pub y: Vector3D,

@@ -3,7 +3,7 @@ use std::ops::{Add, Sub, Mul, Div, Neg};
 
 use super::{Point3D, Vector3D, AsVector, Matrix3D};
 
-#[derive(PartialEq, PartialOrd, Clone, Show)]
+#[derive(PartialEq, PartialOrd, Clone, Debug)]
 pub struct Direction3D {
     direction: Vector3D
 }
