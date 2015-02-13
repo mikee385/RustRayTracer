@@ -1,4 +1,4 @@
-# Simple Ray Tracer - Rust #
+# Simple Ray Tracer - Rust
 
 The intention of this project is to have a meaningful program to create while I am learning the Rust programming language.
 
@@ -16,3 +16,9 @@ The design of this program is entirely my own, but the concepts and ideas were h
 
 - Raytracing Topics & Techniques by Jacco Bikker ([http://www.flipcode.com/archives/Raytracing_Topics_Techniques-Part_1_Introduction.shtml](http://www.flipcode.com/archives/Raytracing_Topics_Techniques-Part_1_Introduction.shtml "http://www.flipcode.com/archives/Raytracing_Topics_Techniques-Part_1_Introduction.shtml"))
 - 3D Basic Lessons ([http://www.scratchapixel.com/lessons/3d-basic-lessons/](http://www.scratchapixel.com/lessons/3d-basic-lessons/ "http://www.scratchapixel.com/lessons/3d-basic-lessons/"))
+
+## License
+
+RustRayTracer is distributed under the terms of the BSD 2-clause license.
+
+See LICENSE.md for details.
