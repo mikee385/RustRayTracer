@@ -1,4 +1,5 @@
-use std::old_io::{File, Open, Write, IoResult};
+use std::fs::{OpenOptions};
+use std::io::{Write, Result};
 use std::num::{Float};
 
 use color::{ColorRGB};
@@ -16,27 +17,24 @@ impl PPMImage {
         }
     }
     
-    pub fn save(&self, image: &Table<ColorRGB>) -> IoResult<()> {
+    pub fn save(&self, image: &Table<ColorRGB>) -> Result<()> {
         let file_path = Path::new(&self.file_name);
-        let mut file = try!(File::open_mode(&file_path, Open, Write));
+
+        let mut file = try!(OpenOptions::new().create(true).write(true).open(&file_path));
 
         let (width, height) = image.get_dimensions();
 
-        try!(file.write_line("P6"));
-        try!(file.write_uint(width));
-        try!(file.write_str(" "));
-        try!(file.write_uint(height));
-        try!(file.write_line(""));
-        try!(file.write_line("255"));
+        try!(writeln!(&mut file, "P6"));
+        try!(writeln!(&mut file, "{} {}", width, height));
+        try!(writeln!(&mut file, "255"));
 
         for pixel in image.iter() {                
             let red = convert_to_u8(pixel.red);
             let green = convert_to_u8(pixel.green);
             let blue = convert_to_u8(pixel.blue);
             
-            try!(file.write_u8(red));
-            try!(file.write_u8(green));
-            try!(file.write_u8(blue));
+            let pixel_bytes = vec![red, green, blue];
+            try!(file.write(&pixel_bytes));
         }
         Ok(())
     }
