@@ -64,7 +64,7 @@ impl Scene {
 
         // Find the nearest object that the ray intersects.
         let mut optional_nearest: Option<(&InternalObject, f32)> = None;
-        for current_item in self.items.iter() {
+        for current_item in &self.items {
             let optional_intersection = current_item.object.intersect(ray);
             if let Some(current_distance) = optional_intersection {
                 match optional_nearest {
@@ -151,7 +151,7 @@ impl Scene {
         }
         
         // Calculate the color from each light in the scene.
-        for light_item in self.lights.iter() {
+        for light_item in &self.lights {
             let light = &light_item.light;
             let light_color = light.get_material(&point).color;
             let vector_to_light = Vector3D::between_points(&point, light.get_center());
@@ -162,7 +162,7 @@ impl Scene {
             let mut shade: f32 = 1.0;
             let nearby_point = point.translate_dist(&direction_to_light, BIAS);
             let shadow_ray = Ray3D::new(&nearby_point, &direction_to_light);
-            for shadow_item in self.items.iter() {
+            for shadow_item in &self.items {
                 if shadow_item.index != light_item.index {
                     let shadow_result = shadow_item.object.intersect(&shadow_ray);
                     if let Some(distance) = shadow_result {

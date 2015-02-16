@@ -28,7 +28,7 @@ impl PPMImage {
         try!(writeln!(&mut file, "{} {}", width, height));
         try!(writeln!(&mut file, "255"));
 
-        for pixel in image.iter() {                
+        for pixel in image {                
             let red = convert_to_u8(pixel.red);
             let green = convert_to_u8(pixel.green);
             let blue = convert_to_u8(pixel.blue);

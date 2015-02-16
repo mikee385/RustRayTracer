@@ -397,7 +397,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
             let mut pixel_color = ColorRGB::black().clone();
             
             camera.get_sub_rays(index, &mut sub_rays);
-            for sub_ray in sub_rays.iter() {
+            for sub_ray in &sub_rays {
                 let result = scene.trace(sub_ray, 0);
                 
                 pixel_color = ColorRGB::from_rgb(

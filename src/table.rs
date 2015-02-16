@@ -1,4 +1,4 @@
-use std::iter::{repeat};
+use std::iter::{repeat, IntoIterator};
 use std::ops::{Index, IndexMut};
 use std::slice::{Iter, IterMut};
 use std::vec::{Vec, IntoIter};
@@ -73,6 +73,30 @@ impl<T> IndexMut<(usize, usize)> for Table<T> {
     fn index_mut<'a>(&'a mut self, index: &(usize, usize)) -> &'a mut T {
         let vec_index = self.get_vec_index(*index);
         self.data.index_mut(&vec_index)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Table<T> {
+    type IntoIter = TableIter<Iter<'a, T>>;
+
+    fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Table<T> {
+    type IntoIter = TableIter<IterMut<'a, T>>;
+
+    fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<T> IntoIterator for Table<T> {
+    type IntoIter = TableIter<IntoIter<T>>;
+
+    fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
+        self.into_iter()
     }
 }
 
