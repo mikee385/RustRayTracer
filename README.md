@@ -19,6 +19,6 @@ The design of this program is entirely my own, but the concepts and ideas were h
 
 ## License
 
-RustRayTracer is distributed under the terms of the BSD 2-clause license.
+RustRayTracer is distributed under the terms of the MIT license.
 
 See LICENSE.md for details.
