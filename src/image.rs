@@ -1,6 +1,7 @@
 use std::fs::{OpenOptions};
 use std::io::{Write, Result};
 use std::num::{Float};
+use std::path::{Path};
 
 use color::{ColorRGB};
 use table::{Table};

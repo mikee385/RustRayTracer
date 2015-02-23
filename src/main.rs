@@ -2,10 +2,10 @@
 
 extern crate time;
 
-use std::os::{num_cpus};
+use std::os;
 use std::num::{Float};
 use std::sync::{Arc};
-use std::thread::{Thread};
+use std::thread;
 
 use color::{ColorRGB};
 use geometry::{Point3D, Vector3D, Direction3D, Ray3D};
@@ -306,7 +306,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     // let initial_coloring_end = time::precise_time_ns();
 
     let thread_setup_start = time::precise_time_ns();
-    let num_threads = num_cpus();
+    let num_threads = os::num_cpus();
 
     let total_pixels = width * height;
     let pixels_per_thread = if total_pixels % num_threads > 0 {
@@ -319,7 +319,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let initial_coloring_threads = (0..num_threads).map(|thread_index| {
         let local_camera = camera.clone();
         let local_scene = scene.clone();
-        Thread::scoped(move|| {
+        thread::scoped(move|| {
             let start_index = pixels_per_thread * thread_index;
 
             let num_pixels = if thread_index != num_threads-1 {
@@ -343,12 +343,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let thread_setup_end = time::precise_time_ns();
 
     let thread_waiting_start = time::precise_time_ns();
-    let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| {
-        match f.join() {
-            Ok(local_table) => local_table.into_iter(),
-            Err(e) => panic!(e)
-        }
-    }).collect::<Vec<_>>();
+    let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| f.join().into_iter()).collect::<Vec<_>>();
     let thread_waiting_end = time::precise_time_ns();
 
     // Collect the colored pixels back into the original table.

@@ -77,6 +77,7 @@ impl<T> IndexMut<(usize, usize)> for Table<T> {
 }
 
 impl<'a, T> IntoIterator for &'a Table<T> {
+    type Item = &'a T;
     type IntoIter = TableIter<Iter<'a, T>>;
 
     fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
@@ -85,6 +86,7 @@ impl<'a, T> IntoIterator for &'a Table<T> {
 }
 
 impl<'a, T> IntoIterator for &'a mut Table<T> {
+    type Item = &'a mut T;
     type IntoIter = TableIter<IterMut<'a, T>>;
 
     fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
@@ -93,6 +95,7 @@ impl<'a, T> IntoIterator for &'a mut Table<T> {
 }
 
 impl<T> IntoIterator for Table<T> {
+    type Item = T;
     type IntoIter = TableIter<IntoIter<T>>;
 
     fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
@@ -115,11 +118,11 @@ impl<T: Iterator> Iterator for TableIter<T> {
     }
 }
 
-pub trait AsTable<'a, T: Iterator> {
+pub trait AsTable {
     fn as_table(self, dimensions: (usize, usize)) -> TableIter<Self>;
 }
 
-impl<'a, T: Iterator> AsTable<'a, T> for T {
+impl<'a, T: Iterator> AsTable for T {
     #[inline]
     fn as_table(self, dimensions: (usize, usize)) -> TableIter<Self> {
         TableIter {
@@ -164,7 +167,7 @@ impl<T: Iterator> Iterator for TableEnumerate<TableIter<T>> {
     }
 }
 
-impl<T> TableIter<T> {
+impl<T: Iterator> TableIter<T> {
     #[inline]
     pub fn enumerate_2d(self) -> TableEnumerate<TableIter<T>> {
         TableEnumerate {
