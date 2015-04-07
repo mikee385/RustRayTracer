@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
+extern crate num_cpus;
 extern crate time;
 
-use std::os;
 use std::num::{Float};
 use std::sync::{Arc};
 use std::thread;
@@ -306,7 +306,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     // let initial_coloring_end = time::precise_time_ns();
 
     let thread_setup_start = time::precise_time_ns();
-    let num_threads = os::num_cpus();
+    let num_threads = num_cpus::get();
 
     let total_pixels = width * height;
     let pixels_per_thread = if total_pixels % num_threads > 0 {

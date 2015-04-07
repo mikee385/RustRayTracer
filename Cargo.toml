@@ -9,4 +9,5 @@ name = "RustRayTracer"
 path = "src/main.rs"
 
 [dependencies]
+num_cpus = "*"
 time = "*"
