@@ -127,11 +127,11 @@ impl Vector3D {
 
 #[macro_export]
 macro_rules! as_vector_add {
-    ($T:ty) => (
-        impl<'a, 'b, U: AsVector> Add<&'a U> for &'b $T {
+    ($T:ty, $U:ty) => (
+        impl<'a, 'b> Add<&'a $U> for &'b $T {
             type Output = Vector3D;
             
-            fn add(self, other: &U) -> Vector3D {
+            fn add(self, other: &$U) -> Vector3D {
                 let v1 = self.as_vector();
                 let v2 = other.as_vector();
 
@@ -143,26 +143,26 @@ macro_rules! as_vector_add {
             }
         }
 
-        impl<'a, U: AsVector> Add<&'a U> for $T {
+        impl<'a> Add<&'a $U> for $T {
             type Output = Vector3D;
             
-            fn add(self, other: &U) -> Vector3D {
+            fn add(self, other: &$U) -> Vector3D {
                 &self + other
             }
         }
 
-        impl<'a, U: AsVector> Add<U> for &'a $T {
+        impl<'a> Add<$U> for &'a $T {
             type Output = Vector3D;
             
-            fn add(self, other: U) -> Vector3D {
+            fn add(self, other: $U) -> Vector3D {
                 self + &other
             }
         }
 
-        impl<U: AsVector> Add<U> for $T {
+        impl Add<$U> for $T {
             type Output = Vector3D;
             
-            fn add(self, other: U) -> Vector3D {
+            fn add(self, other: $U) -> Vector3D {
                 &self + &other
             }
         }
@@ -171,11 +171,11 @@ macro_rules! as_vector_add {
 
 #[macro_export]
 macro_rules! as_vector_sub {
-    ($T:ty) => (
-        impl<'a, 'b, U: AsVector> Sub<&'a U> for &'b $T {
+    ($T:ty, $U:ty) => (
+        impl<'a, 'b> Sub<&'a $U> for &'b $T {
             type Output = Vector3D;
             
-            fn sub(self, other: &U) -> Vector3D {
+            fn sub(self, other: &$U) -> Vector3D {
                 let v1 = self.as_vector();
                 let v2 = other.as_vector();
 
@@ -187,26 +187,26 @@ macro_rules! as_vector_sub {
             }
         }
 
-        impl<'a, U: AsVector> Sub<&'a U> for $T {
+        impl<'a> Sub<&'a $U> for $T {
             type Output = Vector3D;
             
-            fn sub(self, other: &U) -> Vector3D {
+            fn sub(self, other: &$U) -> Vector3D {
                 &self - other
             }
         }
 
-        impl<'a, U: AsVector> Sub<U> for &'a $T {
+        impl<'a> Sub<$U> for &'a $T {
             type Output = Vector3D;
             
-            fn sub(self, other: U) -> Vector3D {
+            fn sub(self, other: $U) -> Vector3D {
                 self - &other
             }
         }
 
-        impl<U: AsVector> Sub<U> for $T {
+        impl Sub<$U> for $T {
             type Output = Vector3D;
             
-            fn sub(self, other: U) -> Vector3D {
+            fn sub(self, other: $U) -> Vector3D {
                 &self - &other
             }
         }
@@ -264,8 +264,8 @@ impl AsVector for Vector3D {
     }
 }
 
-as_vector_add!(Vector3D);
-as_vector_sub!(Vector3D);
+as_vector_add!(Vector3D, Vector3D);
+as_vector_sub!(Vector3D, Vector3D);
 as_vector_mul!(Vector3D);
 as_vector_div!(Vector3D);
 

@@ -135,8 +135,12 @@ impl AsVector for Direction3D {
     }
 }
 
-as_vector_add!(Direction3D);
-as_vector_sub!(Direction3D);
+as_vector_add!(Direction3D, Direction3D);
+as_vector_add!(Direction3D, Vector3D);
+as_vector_add!(Vector3D, Direction3D);
+as_vector_sub!(Direction3D, Direction3D);
+as_vector_sub!(Direction3D, Vector3D);
+as_vector_sub!(Vector3D, Direction3D);
 as_vector_mul!(Direction3D);
 as_vector_div!(Direction3D);
 
