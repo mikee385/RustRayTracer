@@ -62,17 +62,17 @@ impl<T> Index<(usize, usize)> for Table<T> {
     type Output = T;
 
     #[inline]
-    fn index<'a>(&'a self, index: &(usize, usize)) -> &'a T {
-        let vec_index = self.get_vec_index(*index);
-        self.data.index(&vec_index)
+    fn index<'a>(&'a self, index: (usize, usize)) -> &'a T {
+        let vec_index = self.get_vec_index(index);
+        self.data.index(vec_index)
     }
 }
 
 impl<T> IndexMut<(usize, usize)> for Table<T> {
     #[inline]
-    fn index_mut<'a>(&'a mut self, index: &(usize, usize)) -> &'a mut T {
-        let vec_index = self.get_vec_index(*index);
-        self.data.index_mut(&vec_index)
+    fn index_mut<'a>(&'a mut self, index: (usize, usize)) -> &'a mut T {
+        let vec_index = self.get_vec_index(index);
+        self.data.index_mut(vec_index)
     }
 }
 
