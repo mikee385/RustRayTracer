@@ -1,4 +1,3 @@
-use std::num::{Float};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 use super::{Point3D, Vector3D, AsVector, Matrix3D};

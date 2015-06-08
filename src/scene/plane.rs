@@ -1,5 +1,3 @@
-use std::num::{Float};
-
 use geometry::{EPSILON, Point3D, Vector3D, AsVector, Direction3D, Ray3D};
 use material::{Material};
 

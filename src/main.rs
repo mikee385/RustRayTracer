@@ -3,7 +3,6 @@
 extern crate num_cpus;
 extern crate time;
 
-use std::num::{Float};
 use std::sync::{Arc};
 use std::thread;
 
@@ -319,7 +318,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let initial_coloring_threads = (0..num_threads).map(|thread_index| {
         let local_camera = camera.clone();
         let local_scene = scene.clone();
-        thread::scoped(move|| {
+        thread::spawn(move|| {
             let start_index = pixels_per_thread * thread_index;
 
             let num_pixels = if thread_index != num_threads-1 {
@@ -343,7 +342,7 @@ fn render(scene: Arc<Scene>, camera: Arc<Camera>) -> Table<ColorRGB> {
     let thread_setup_end = time::precise_time_ns();
 
     let thread_waiting_start = time::precise_time_ns();
-    let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| f.join().into_iter()).collect::<Vec<_>>();
+    let initial_coloring = initial_coloring_threads.into_iter().flat_map(|f| f.join().unwrap().into_iter()).collect::<Vec<_>>();
     let thread_waiting_end = time::precise_time_ns();
 
     // Collect the colored pixels back into the original table.
