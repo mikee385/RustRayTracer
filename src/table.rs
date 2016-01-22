@@ -118,7 +118,7 @@ impl<T: Iterator> Iterator for TableIter<T> {
     }
 }
 
-pub trait AsTable {
+pub trait AsTable: Sized + Iterator {
     fn as_table(self, dimensions: (usize, usize)) -> TableIter<Self>;
 }
 
